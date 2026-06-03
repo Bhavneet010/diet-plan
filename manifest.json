@@ -1,0 +1,14 @@
+{
+  "name": "Glow Plan Tracker",
+  "short_name": "GlowPlan",
+  "description": "Track your 90-day glow weight-loss routine — meals, workouts, water, sleep & glow.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1410",
+  "theme_color": "#c97b5a",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
