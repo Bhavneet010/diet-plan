@@ -57,7 +57,6 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
 .daybar .nav:active{transform:scale(.94)}
 .daybar .center{text-align:center;flex:1}
 .daybar .dnum{font-family:var(--fdisp);font-size:27px;font-weight:600;line-height:1}
-.daybar .dmeta{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
 .today-chip{display:inline-block;margin-top:5px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;
   color:var(--terra-deep);border:1px solid rgba(233,120,120,.32);border-radius:20px;padding:3px 10px;cursor:pointer;
   background:#fff2f1;font-weight:600}
@@ -262,7 +261,6 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
       <button class="nav" id="prevDay">‹</button>
       <div class="center">
         <div class="dnum" id="dayNum">Day 1</div>
-        <div class="dmeta" id="dayMeta">Mon · ~1,300 kcal</div>
         <span class="today-chip" id="jumpToday">Jump to today</span>
       </div>
       <button class="nav" id="nextDay">›</button>
@@ -291,8 +289,6 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
     <div class="sec"><h2>Glow &amp; wellbeing</h2><span class="hint">rate 1–5</span></div>
     <div id="glowBox"></div>
     </div>
-
-    <p class="note-disclaim">Gentle, steady pace protects your glow. Not medical advice — confirm with your doctor, especially around thyroid.</p>
   </section>
 
   <!-- ============ CALENDAR VIEW ============ -->
@@ -611,7 +607,6 @@ function renderToday(){
   const log = getLog(iso);
 
   $("#dayNum").textContent = "Day "+n + (plan.isCheat?" ★":"");
-  $("#dayMeta").textContent = plan.weekday + " · " + plan.kcal + " · Month "+(plan.monthIdx+1);
 
   // meals
   const ml = $("#mealList"); ml.innerHTML="";
