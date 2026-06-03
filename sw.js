@@ -1,4 +1,4 @@
-const CACHE = "glowplan-v1";
+const CACHE = "glowplan-v2";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#c97b5a" />
+<meta name="theme-color" content="#e97878" />
 <link rel="manifest" href="manifest.json" />
 <title>Glow Plan Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,20 +11,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#17110d; --bg2:#1f1813; --card:#241c16; --card2:#2c221b;
-  --line:#3a2e25; --ink:#f3e9df; --ink-soft:#c8b6a6; --ink-dim:#9b8978;
-  --terra:#d98a63; --terra-deep:#c97b5a; --sage:#8fa67e; --gold:#e0b24c;
-  --rose:#d98aa6; --rose-bg:#3a2530; --ok:#8fa67e; --warn:#e0b24c; --skip:#9b8978;
-  --ring-bg:#33281f;
-  --shadow:0 8px 30px rgba(0,0,0,.45);
+  --bg:#fff8f5; --bg2:#fff3ef; --card:#ffffff; --card2:#fff0ea;
+  --line:#f0d8cf; --ink:#352824; --ink-soft:#7d6961; --ink-dim:#9a847b;
+  --terra:#e97878; --terra-deep:#d9656c; --sage:#8fb996; --gold:#d9a441;
+  --rose:#c97498; --rose-bg:#fff0f4; --ok:#8fb996; --warn:#d9a441; --skip:#b7aaa5;
+  --ring-bg:#f6dfd7;
+  --shadow:0 14px 34px rgba(99,65,54,.12);
   --fdisp:'Fraunces',Georgia,serif; --fbody:'Outfit',system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{
   background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(217,138,99,.16), transparent 60%),
-    radial-gradient(900px 500px at 0% 110%, rgba(143,166,126,.12), transparent 55%),
+    radial-gradient(1200px 600px at 85% -10%, rgba(233,120,120,.18), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, rgba(143,185,150,.18), transparent 55%),
     var(--bg);
   color:var(--ink); font-family:var(--fbody); font-weight:400;
   font-size:16px; line-height:1.5; padding-bottom:84px;
@@ -36,8 +36,8 @@ body{
 header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 .brand{display:flex;align-items:center;gap:11px}
 .logo{width:40px;height:40px;border-radius:13px;flex:none;
-  background:linear-gradient(140deg,var(--terra),var(--gold));
-  display:grid;place-items:center;box-shadow:0 4px 14px rgba(217,138,99,.4)}
+  background:linear-gradient(140deg,var(--terra),#f2b69f);
+  display:grid;place-items:center;box-shadow:0 6px 18px rgba(233,120,120,.24)}
 .logo svg{width:23px;height:23px}
 .brand h1{font-family:var(--fdisp);font-weight:600;font-size:20px;letter-spacing:.2px;line-height:1.1}
 .brand .sub{font-size:12px;color:var(--ink-dim);margin-top:1px}
@@ -55,7 +55,7 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 
 /* score ring card */
 .scorecard{display:flex;align-items:center;gap:16px;margin-top:16px;
-  background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);
+  background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--line);
   border-radius:20px;padding:16px 18px;box-shadow:var(--shadow)}
 .ring{position:relative;width:74px;height:74px;flex:none}
 .ring svg{transform:rotate(-90deg)}
@@ -73,7 +73,7 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 /* meal / item rows */
 .item{background:var(--card);border:1px solid var(--line);border-radius:16px;
   padding:13px 14px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;transition:.18s}
-.item.cheat{background:linear-gradient(150deg,var(--rose-bg),var(--card));border-color:#5a3a48}
+.item.cheat{background:linear-gradient(150deg,var(--rose-bg),var(--card));border-color:#efc9d7}
 .item .tick{width:26px;height:26px;border-radius:9px;border:2px solid var(--line);flex:none;margin-top:2px;
   display:grid;place-items:center;cursor:pointer;transition:.15s;background:transparent}
 .item .tick svg{width:15px;height:15px;opacity:0;transform:scale(.5);transition:.15s}
@@ -91,9 +91,9 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 .item .stags{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
 .stag{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--line);
   color:var(--ink-soft);cursor:pointer;background:var(--bg2);user-select:none}
-.stag.on-done{background:var(--ok);color:#16210f;border-color:var(--ok);font-weight:600}
-.stag.on-mod{background:var(--gold);color:#241a02;border-color:var(--gold);font-weight:600}
-.stag.on-skip{background:#42332a;color:var(--ink-soft);border-color:var(--skip);font-weight:600}
+.stag.on-done{background:var(--ok);color:#ffffff;border-color:var(--ok);font-weight:600}
+.stag.on-mod{background:var(--gold);color:#35240b;border-color:var(--gold);font-weight:600}
+.stag.on-skip{background:#f3ebe7;color:var(--ink-soft);border-color:var(--skip);font-weight:600}
 .modnote{margin-top:8px;width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;
   color:var(--ink);font-family:var(--fbody);font-size:13px;padding:8px 10px;resize:vertical;min-height:38px;display:none}
 .item.mod .modnote{display:block}
@@ -102,7 +102,7 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 .counter{display:flex;align-items:center;gap:12px}
 .counter .dots{display:flex;gap:5px;flex-wrap:wrap;flex:1}
 .drop{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);cursor:pointer;transition:.15s}
-.drop.full{background:linear-gradient(160deg,#6db3d8,#4a90c2);border-color:#4a90c2}
+.drop.full{background:linear-gradient(160deg,#8ac3d7,#5aaac8);border-color:#5aaac8}
 .cbtn{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:var(--card2);
   color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
 .cbtn:active{transform:scale(.92)}
@@ -128,7 +128,7 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 
 /* bottom nav */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;
-  background:rgba(23,17,13,.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  background:rgba(255,248,245,.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding:8px 0 max(8px,env(safe-area-inset-bottom))}
 nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-around}
 .tab{flex:1;background:none;border:none;color:var(--ink-dim);font-family:var(--fbody);font-size:10.5px;
@@ -164,8 +164,8 @@ canvas{width:100%!important}
 
 /* weigh-in + generic */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(150deg,var(--terra),var(--terra-deep));
-  color:#241008;border:none;border-radius:13px;font-family:var(--fbody);font-weight:600;font-size:14px;
-  padding:11px 16px;cursor:pointer;box-shadow:0 4px 14px rgba(217,138,99,.3)}
+  color:#ffffff;border:none;border-radius:13px;font-family:var(--fbody);font-weight:600;font-size:14px;
+  padding:11px 16px;cursor:pointer;box-shadow:0 8px 18px rgba(233,120,120,.22)}
 .btn:active{transform:scale(.97)}
 .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none}
 .btn.full{width:100%}
@@ -178,8 +178,8 @@ canvas{width:100%!important}
   border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:9px}
 .remrow .rl{font-size:14px}.remrow .rl small{display:block;color:var(--ink-dim);font-size:12px;margin-top:2px}
 .switch{width:46px;height:27px;border-radius:20px;background:var(--ring-bg);position:relative;cursor:pointer;transition:.2s;flex:none}
-.switch:after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:var(--ink);transition:.2s}
-.switch.on{background:var(--sage)}.switch.on:after{left:22px;background:#16210f}
+.switch:after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#ffffff;box-shadow:0 2px 8px rgba(53,40,36,.16);transition:.2s}
+.switch.on{background:var(--sage)}.switch.on:after{left:22px;background:#ffffff}
 
 .empty{text-align:center;color:var(--ink-dim);font-size:13.5px;padding:30px 10px}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);
@@ -547,7 +547,7 @@ function renderToday(){
     const el=document.createElement("div");
     el.className="item"+(m.cheat?" cheat":"")+(st?(" "+st):"");
     el.innerHTML=`
-      <div class="tick" data-k="${key}" data-cycle="1"><svg viewBox="0 0 24 24" fill="none" stroke="#16210f" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+      <div class="tick" data-k="${key}" data-cycle="1"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
       <div class="body">
         <div class="when"><span>${m.label}</span><span class="cal">${m.cal?m.cal+" kcal":"enjoy!"}</span></div>
         <div class="food">${m.food}</div>
@@ -598,7 +598,7 @@ function renderToday(){
       </div>
     </div></div>
     <div class="item ${supSt?supSt:''}">
-      <div class="tick" data-k="supplement" data-cycle="1"><svg viewBox="0 0 24 24" fill="none" stroke="#16210f" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+      <div class="tick" data-k="supplement" data-cycle="1"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
       <div class="body"><div class="when"><span>Supplements</span></div>
         <div class="food">Took supplements as advised (away from thyroid tablet)</div>
         <div class="stags">
@@ -793,7 +793,7 @@ function ensureChart(id,cfg){
   if(charts[id]) charts[id].destroy();
   charts[id]=new Chart(document.getElementById(id),cfg);
 }
-const gridCol="rgba(155,137,120,.15)", tickCol="#9b8978";
+const gridCol="rgba(125,105,97,.16)", tickCol="#7d6961";
 function baseScales(extra={}){ return {x:{grid:{color:gridCol},ticks:{color:tickCol,font:{size:10}}},y:Object.assign({grid:{color:gridCol},ticks:{color:tickCol,font:{size:10}}},extra)}; }
 
 function drawWeightChart(){
@@ -810,9 +810,9 @@ function drawWeightChart(){
     actLine.push(val);
   }
   ensureChart("weightChart",{type:"line",data:{labels,datasets:[
-    {label:"Target",data:tgt,borderColor:"#8fa67e",borderDash:[5,4],pointRadius:0,borderWidth:2,tension:.3},
-    {label:"You",data:actLine,borderColor:"#d98a63",backgroundColor:"rgba(217,138,99,.12)",
-      pointRadius:3,pointBackgroundColor:"#d98a63",borderWidth:2.5,tension:.3,spanGaps:true,fill:true}
+    {label:"Target",data:tgt,borderColor:"#8fb996",borderDash:[5,4],pointRadius:0,borderWidth:2,tension:.3},
+    {label:"You",data:actLine,borderColor:"#e97878",backgroundColor:"rgba(233,120,120,.12)",
+      pointRadius:3,pointBackgroundColor:"#e97878",borderWidth:2.5,tension:.3,spanGaps:true,fill:true}
   ]},options:{plugins:{legend:{labels:{color:tickCol,font:{size:11},boxWidth:14}}},
     scales:baseScales({suggestedMin:48.5,suggestedMax:53}),responsive:true,maintainAspectRatio:false}});
 }
@@ -820,7 +820,7 @@ function drawAdhChart(){
   const labels=[],data=[];
   const today=Math.min(90,Math.max(1,dayNumFor(todayISO())));
   for(let d=Math.max(1,today-13); d<=today; d++){ labels.push("D"+d); const s=dayScore(isoForDayNum(d)); data.push(s?s.pct:0); }
-  ensureChart("adhChart",{type:"bar",data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=80?"#8fa67e":v>=50?"#e0b24c":"#d98a63"),borderRadius:5}]},
+  ensureChart("adhChart",{type:"bar",data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=80?"#8fb996":v>=50?"#d9a441":"#e97878"),borderRadius:5}]},
     options:{plugins:{legend:{display:false}},scales:baseScales({suggestedMax:100,ticks:{color:tickCol,font:{size:10},callback:v=>v+"%"}}),responsive:true,maintainAspectRatio:false}});
 }
 function drawGlowChart(){
@@ -828,9 +828,9 @@ function drawGlowChart(){
   const today=Math.min(90,Math.max(1,dayNumFor(todayISO())));
   for(let d=Math.max(1,today-13); d<=today; d++){ const g=(getLog(isoForDayNum(d)).glow)||{}; labels.push("D"+d); skin.push(g.skin||null);energy.push(g.energy||null);mood.push(g.mood||null); }
   ensureChart("glowChart",{type:"line",data:{labels,datasets:[
-    {label:"Skin",data:skin,borderColor:"#d98aa6",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true},
-    {label:"Energy",data:energy,borderColor:"#e0b24c",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true},
-    {label:"Mood",data:mood,borderColor:"#8fa67e",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true}
+    {label:"Skin",data:skin,borderColor:"#e97878",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true},
+    {label:"Energy",data:energy,borderColor:"#d9a441",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true},
+    {label:"Mood",data:mood,borderColor:"#8fb996",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true}
   ]},options:{plugins:{legend:{labels:{color:tickCol,font:{size:11},boxWidth:12}}},
     scales:baseScales({suggestedMin:0,suggestedMax:5,ticks:{color:tickCol,stepSize:1,font:{size:10}}}),responsive:true,maintainAspectRatio:false}});
 }
