@@ -18,20 +18,23 @@
   --ring-bg:#f6dfd7;
   --shadow:0 14px 34px rgba(99,65,54,.1);
   --shadow-sm:0 8px 22px rgba(99,65,54,.08);
+  --bottom-tabs-space:calc(122px + env(safe-area-inset-bottom));
   --fdisp:'Fraunces',Georgia,serif; --fbody:'Outfit',system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
+html{scroll-padding-bottom:var(--bottom-tabs-space)}
 body{
   background:
     radial-gradient(900px 420px at 88% -8%, rgba(233,120,120,.16), transparent 62%),
     radial-gradient(700px 420px at 4% 105%, rgba(143,185,150,.16), transparent 58%),
     var(--bg);
   color:var(--ink); font-family:var(--fbody); font-weight:400;
-  font-size:16px; line-height:1.42; padding-bottom:78px;
+  font-size:16px; line-height:1.42; padding-bottom:var(--bottom-tabs-space);
   overscroll-behavior-y:contain;
 }
 .wrap{max-width:500px;margin:0 auto;padding:0 16px}
+main.wrap{padding-bottom:28px}
 
 /* header */
 header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
