@@ -68,6 +68,15 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 .scorecard .meta .small{font-size:13px;color:var(--ink-soft);margin-top:2px}
 .streak{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:13px;color:var(--gold)}
 
+/* today section switcher */
+.today-switch{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:16px 0 6px;
+  background:#fff0ea;border:1px solid var(--line);border-radius:18px;padding:5px;box-shadow:var(--shadow-sm)}
+.today-mode{border:0;border-radius:14px;background:transparent;color:var(--ink-soft);
+  font-family:var(--fbody);font-size:12.5px;font-weight:700;padding:10px 6px;cursor:pointer}
+.today-mode.active{background:var(--card);color:var(--terra-deep);box-shadow:0 6px 16px rgba(99,65,54,.09)}
+.today-panel{display:none;animation:fade .2s ease}
+.today-panel.active{display:block}
+
 /* section title */
 .sec{margin:24px 0 10px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .sec h2{font-family:var(--fdisp);font-size:16px;font-weight:600;letter-spacing:.2px}
@@ -232,17 +241,29 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
       </div>
     </div>
 
+    <div class="today-switch" aria-label="Today sections">
+      <button class="today-mode" data-today-panel="workout">Workout</button>
+      <button class="today-mode active" data-today-panel="meals">Meals</button>
+      <button class="today-mode" data-today-panel="targets">Daily Targets</button>
+    </div>
+
+    <div class="today-panel active" data-panel="meals">
     <div class="sec"><h2>Meals</h2><span class="hint">tap ✓ done · ✎ modified · ✕ skip</span></div>
     <div id="mealList"></div>
+    </div>
 
+    <div class="today-panel" data-panel="workout">
     <div class="sec"><h2>Workout</h2><span class="hint" id="wStatusHint">tap to log</span></div>
     <div id="workoutBox"></div>
+    </div>
 
+    <div class="today-panel" data-panel="targets">
     <div class="sec"><h2>Daily targets</h2></div>
     <div id="targetsBox"></div>
 
     <div class="sec"><h2>Glow &amp; wellbeing</h2><span class="hint">rate 1–5</span></div>
     <div id="glowBox"></div>
+    </div>
 
     <p class="note-disclaim">Gentle, steady pace protects your glow. Not medical advice — confirm with your doctor, especially around thyroid.</p>
   </section>
@@ -535,6 +556,13 @@ function clampDay(n){ return Math.min(90, Math.max(1, n)); }
 /* ================= TODAY VIEW RENDER ================= */
 const $ = (s)=>document.querySelector(s);
 const $$ = (s)=>document.querySelectorAll(s);
+let todayPanel = "meals";
+
+function setTodayPanel(panel){
+  todayPanel = panel;
+  $$(".today-mode").forEach(b=>b.classList.toggle("active", b.dataset.todayPanel===panel));
+  $$(".today-panel").forEach(p=>p.classList.toggle("active", p.dataset.panel===panel));
+}
 
 function renderToday(){
   const n = viewDay;
@@ -626,6 +654,7 @@ function renderToday(){
   bindTodayEvents(iso);
   updateScore(iso);
   stepsStateText(log);
+  setTodayPanel(todayPanel);
 }
 
 function stepsStateText(log){
@@ -725,6 +754,7 @@ function haptic(){ if(navigator.vibrate) navigator.vibrate(8); }
 $("#prevDay").onclick=()=>{ viewDay=clampDay(viewDay-1); renderToday(); };
 $("#nextDay").onclick=()=>{ viewDay=clampDay(viewDay+1); renderToday(); };
 $("#jumpToday").onclick=()=>{ viewDay=clampDay(dayNumFor(todayISO())); renderToday(); toast("Jumped to today"); };
+$$(".today-mode").forEach(b=>b.onclick=()=>setTodayPanel(b.dataset.todayPanel));
 
 $$(".tab").forEach(t=>t.onclick=()=>{
   $$(".tab").forEach(x=>x.classList.remove("active"));
