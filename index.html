@@ -288,9 +288,6 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
     <div class="today-panel" data-panel="targets">
     <div class="sec"><h2>Daily targets</h2></div>
     <div id="targetsBox"></div>
-
-    <div class="sec"><h2>Glow &amp; wellbeing</h2><span class="hint">rate 1–5</span></div>
-    <div id="glowBox"></div>
     </div>
   </section>
 
@@ -332,10 +329,6 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
       <div class="chart-frame"><canvas id="adhChart"></canvas></div>
     </div>
 
-    <div class="chartbox">
-      <h3>Glow &amp; energy trend</h3>
-      <div class="chart-frame"><canvas id="glowChart"></canvas></div>
-    </div>
   </section>
 
   <!-- ============ SETTINGS VIEW ============ -->
@@ -690,16 +683,6 @@ function renderToday(){
         </div>
       </div></div>`;
 
-  // glow log
-  const g=log.glow||{};
-  const gb=$("#glowBox");
-  gb.innerHTML=`<div class="glowlog">
-    ${["skin","energy","mood"].map(k=>`
-      <div class="glowrow"><span class="gl">${k[0].toUpperCase()+k.slice(1)}</span>
-        <div class="stars" data-g="${k}">${[1,2,3,4,5].map(i=>`<span class="star ${g[k]>=i?'on':''}" data-val="${i}">★</span>`).join("")}</div>
-      </div>`).join("")}
-  </div>`;
-
   bindTodayEvents(iso);
   updateScore(iso);
   stepsStateText(log);
@@ -799,13 +782,6 @@ function bindTodayEvents(iso){
   // steps & sleep
   const si=$("#stepsIn"); if(si) si.oninput=()=>{ log.steps=+si.value||0; setLog(iso,log); updateScore(iso); stepsStateText(log); };
   const sl=$("#sleepIn"); if(sl) sl.oninput=()=>{ log.sleep=+sl.value||0; setLog(iso,log); updateScore(iso); };
-  // glow stars
-  $$(".stars").forEach(row=>{
-    row.querySelectorAll(".star").forEach(st=>st.onclick=()=>{
-      const g=row.dataset.g, val=+st.dataset.val;
-      log.glow=log.glow||{}; log.glow[g]=(log.glow[g]===val)?0:val; setLog(iso,log); renderToday(); haptic();
-    });
-  });
 }
 function haptic(){ if(navigator.vibrate) navigator.vibrate(8); }
 
@@ -871,7 +847,7 @@ function renderStats(){
   $("#stLogged").textContent = cnt;
   const w=getWeights(); $("#stWeight").textContent = w.length?w[w.length-1].kg+" kg":"—";
 
-  drawWeightChart(); drawAdhChart(); drawGlowChart();
+  drawWeightChart(); drawAdhChart();
   // pace text
   if(w.length){
     const latest=w[w.length-1]; const dn=clampDay(dayNumFor(latest.iso));
@@ -920,18 +896,6 @@ function drawAdhChart(){
   ensureChart("adhChart",{type:"bar",data:{labels,datasets:[{data,backgroundColor:data.map(v=>v>=80?"#8fb996":v>=50?"#d9a441":"#e97878"),borderRadius:5}]},
     options:{plugins:{legend:{display:false}},scales:baseScales({suggestedMax:100,ticks:{color:tickCol,font:{size:10},callback:v=>v+"%"}}),responsive:true,maintainAspectRatio:false}});
 }
-function drawGlowChart(){
-  const labels=[],skin=[],energy=[],mood=[];
-  const today=Math.min(90,Math.max(1,dayNumFor(todayISO())));
-  for(let d=Math.max(1,today-13); d<=today; d++){ const g=(getLog(isoForDayNum(d)).glow)||{}; labels.push("D"+d); skin.push(g.skin||null);energy.push(g.energy||null);mood.push(g.mood||null); }
-  ensureChart("glowChart",{type:"line",data:{labels,datasets:[
-    {label:"Skin",data:skin,borderColor:"#e97878",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true},
-    {label:"Energy",data:energy,borderColor:"#d9a441",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true},
-    {label:"Mood",data:mood,borderColor:"#8fb996",pointRadius:2,borderWidth:2,tension:.35,spanGaps:true}
-  ]},options:{plugins:{legend:{labels:{color:tickCol,font:{size:11},boxWidth:12}}},
-    scales:baseScales({suggestedMin:0,suggestedMax:5,ticks:{color:tickCol,stepSize:1,font:{size:10}}}),responsive:true,maintainAspectRatio:false}});
-}
-
 $("#logWeight").onclick=()=>{
   const v=parseFloat($("#wInput").value); if(!v){toast("Enter a weight");return;}
   const w=getWeights(); const iso=todayISO();
