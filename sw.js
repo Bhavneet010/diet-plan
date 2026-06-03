@@ -1,4 +1,4 @@
-const CACHE = "dietplan-v6";
+const CACHE = "dietplan-v7";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {
