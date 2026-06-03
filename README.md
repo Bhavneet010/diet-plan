@@ -1,7 +1,7 @@
-# Glow Plan Tracker — PWA
+# Diet Plan Tracker — PWA
 
-A private, offline, installable app that tracks your exact 90-day glow weight-loss
-routine (meals, workouts, water, steps, sleep, supplements, glow ratings, cheat days).
+A private, offline, installable app that tracks your exact 90-day diet
+routine (meals, workouts, water, steps, sleep, supplements, wellbeing ratings, cheat days).
 All data stays on your device — no login, no servers, nothing uploaded.
 
 ## Files

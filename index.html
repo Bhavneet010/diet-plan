@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#e97878" />
 <link rel="manifest" href="manifest.json" />
-<title>Glow Plan Tracker</title>
+<title>Diet Plan Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -209,7 +209,7 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
 <header class="app"><div class="wrap">
   <div class="brand">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2c0 4-3 5-3 8a3 3 0 006 0c0-3-3-4-3-8z" fill="#fff8f0"/><circle cx="12" cy="17" r="4.5" stroke="#fff8f0" stroke-width="1.6"/></svg></div>
-    <div><h1>Glow Plan</h1><div class="sub">90-day routine tracker</div></div>
+    <div><h1>Diet Plan Tracker</h1><div class="sub">90-day routine tracker</div></div>
   </div>
 </div></header>
 
@@ -929,7 +929,7 @@ function scheduleReminders(){
     const ms=fire-now;
     if(ms < 24*3600*1000){
       remTimers.push(setTimeout(()=>{
-        try{ new Notification("Glow Plan — "+r.label,{body:r.desc,icon:"icon-192.png"}); }catch(e){}
+        try{ new Notification("Diet Plan Tracker — "+r.label,{body:r.desc,icon:"icon-192.png"}); }catch(e){}
         scheduleReminders();
       }, ms));
     }
@@ -947,13 +947,13 @@ $("#exportCsv").onclick=()=>{
   }
   const w=getWeights();
   rows.push([]); rows.push(["Weight log"]); rows.push(["Date","kg"]); w.forEach(e=>rows.push([e.iso,e.kg]));
-  download("glow-plan-log.csv", rows.map(r=>r.join(",")).join("\n"), "text/csv");
+  download("diet-plan-log.csv", rows.map(r=>r.join(",")).join("\n"), "text/csv");
   toast("CSV exported");
 };
 $("#exportJson").onclick=()=>{
   const dump={settings:SETTINGS,weights:getWeights(),logs:{}};
   for(let d=1; d<=90; d++){ const iso=isoForDayNum(d); const k=logKey(iso); const v=localStorage.getItem(k); if(v) dump.logs[iso]=JSON.parse(v); }
-  download("glow-plan-backup.json", JSON.stringify(dump,null,2), "application/json");
+  download("diet-plan-backup.json", JSON.stringify(dump,null,2), "application/json");
   toast("Backup saved");
 };
 $("#importJson").onchange=(e)=>{

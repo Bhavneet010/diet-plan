@@ -1,7 +1,7 @@
 {
-  "name": "Glow Plan Tracker",
-  "short_name": "GlowPlan",
-  "description": "Track your 90-day glow weight-loss routine — meals, workouts, water, sleep & glow.",
+  "name": "Diet Plan Tracker",
+  "short_name": "DietPlan",
+  "description": "Track your 90-day diet routine — meals, workouts, water, sleep & wellbeing.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fff8f5",
