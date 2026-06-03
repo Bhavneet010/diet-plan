@@ -35,6 +35,7 @@ body{
 
 /* header */
 header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .brand{display:flex;align-items:center;gap:11px}
 .logo{width:42px;height:42px;border-radius:15px;flex:none;
   background:linear-gradient(140deg,var(--terra),#f2b69f);
@@ -42,6 +43,11 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 .logo svg{width:23px;height:23px}
 .brand h1{font-family:var(--fdisp);font-weight:600;font-size:21px;letter-spacing:.2px;line-height:1.1}
 .brand .sub{font-size:12px;color:var(--ink-dim);margin-top:1px}
+.header-score{width:58px;height:58px;border-radius:18px;background:rgba(255,255,255,.74);
+  border:1px solid var(--line);display:grid;place-items:center;box-shadow:var(--shadow-sm);flex:none}
+.header-score .ring{width:48px;height:48px}
+.header-score .ring svg{width:48px;height:48px}
+.header-score .ring .pct{font-size:13px}
 
 /* day strip */
 .daybar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px}
@@ -61,7 +67,7 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
   background:rgba(255,255,255,.86);border:1px solid var(--line);
   border-radius:22px;padding:17px 18px;box-shadow:var(--shadow)}
 .ring{position:relative;width:74px;height:74px;flex:none}
-.ring svg{transform:rotate(-90deg)}
+.ring svg{transform:rotate(-90deg);transform-origin:center}
 .ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--fdisp);font-weight:600;font-size:18px}
 .scorecard .meta{flex:1;display:none}
 .scorecard .meta .big{font-family:var(--fdisp);font-size:17px;font-weight:600}
@@ -221,10 +227,23 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
 </style>
 </head>
 <body>
-<header class="app"><div class="wrap">
+<header class="app"><div class="wrap topbar">
   <div class="brand">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2c0 4-3 5-3 8a3 3 0 006 0c0-3-3-4-3-8z" fill="#fff8f0"/><circle cx="12" cy="17" r="4.5" stroke="#fff8f0" stroke-width="1.6"/></svg></div>
     <div><h1>Diet Plan Tracker</h1><div class="sub">90-day routine tracker</div></div>
+  </div>
+  <div class="header-score" aria-label="Today progress">
+    <div class="ring">
+      <svg width="74" height="74" viewBox="0 0 74 74"><circle cx="37" cy="37" r="31" stroke="var(--ring-bg)" stroke-width="7" fill="none"/>
+        <circle id="ringFg" cx="37" cy="37" r="31" stroke="var(--terra)" stroke-width="7" fill="none"
+          stroke-linecap="round" stroke-dasharray="195" stroke-dashoffset="195"/></svg>
+      <div class="pct" id="ringPct">0%</div>
+    </div>
+  </div>
+  <div style="display:none" aria-hidden="true">
+    <span id="scoreBig"></span>
+    <span id="scoreSmall"></span>
+    <span id="streakLine"></span>
   </div>
 </div></header>
 
@@ -240,20 +259,6 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
         <span class="today-chip" id="jumpToday">Jump to today</span>
       </div>
       <button class="nav" id="nextDay">›</button>
-    </div>
-
-    <div class="scorecard">
-      <div class="ring">
-        <svg width="74" height="74"><circle cx="37" cy="37" r="31" stroke="var(--ring-bg)" stroke-width="7" fill="none"/>
-          <circle id="ringFg" cx="37" cy="37" r="31" stroke="var(--terra)" stroke-width="7" fill="none"
-            stroke-linecap="round" stroke-dasharray="195" stroke-dashoffset="195"/></svg>
-        <div class="pct" id="ringPct">0%</div>
-      </div>
-      <div class="meta">
-        <div class="big" id="scoreBig">Let's begin the day</div>
-        <div class="small" id="scoreSmall">0 of 11 logged</div>
-        <div class="streak" id="streakLine"></div>
-      </div>
     </div>
 
     <div class="today-switch" aria-label="Today sections">
