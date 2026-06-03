@@ -102,6 +102,20 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 .item .food{font-size:14.5px;margin-top:3px;color:var(--ink)}
 .item .benefit{font-size:12.5px;color:var(--ink-dim);margin-top:4px;line-height:1.35}
 .item .stags{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.item.meal-card{cursor:pointer}
+.item.meal-card.nearest{border-color:rgba(233,120,120,.52);background:linear-gradient(150deg,#fff7f4,#ffffff);
+  box-shadow:0 10px 24px rgba(233,120,120,.16)}
+.item.meal-card.nearest .tick{border-color:rgba(233,120,120,.55)}
+.meal-card .meal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.meal-card .meal-title{min-width:0}
+.meal-card .meal-status{display:flex;align-items:center;gap:6px;flex:none}
+.meal-card .now-chip{border-radius:999px;background:#fff0f1;color:var(--terra-deep);font-size:10.5px;
+  font-weight:700;padding:3px 7px;white-space:nowrap}
+.meal-card .chev{color:var(--ink-dim);font-size:15px;line-height:1;transition:.15s}
+.meal-card.expanded .chev{transform:rotate(180deg)}
+.meal-card .meal-details{display:none}
+.meal-card.expanded .meal-details{display:block}
+.meal-card.collapsed .food,.meal-card.collapsed .benefit,.meal-card.collapsed .stags,.meal-card.collapsed .modnote{display:none}
 .stag{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--line);
   color:var(--ink-soft);cursor:pointer;background:#fff7f4;user-select:none}
 .stag.on-done{background:var(--ok);color:#ffffff;border-color:var(--ok);font-weight:600}
@@ -110,6 +124,7 @@ header.app{padding:max(22px,env(safe-area-inset-top)) 0 10px}
 .modnote{margin-top:8px;width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;
   color:var(--ink);font-family:var(--fbody);font-size:13px;padding:8px 10px;resize:vertical;min-height:38px;display:none}
 .item.mod .modnote{display:block}
+.meal-card.collapsed .modnote{display:none}
 
 /* counters (water/steps) */
 .counter{display:flex;align-items:center;gap:12px}
@@ -557,11 +572,24 @@ function clampDay(n){ return Math.min(90, Math.max(1, n)); }
 const $ = (s)=>document.querySelector(s);
 const $$ = (s)=>document.querySelectorAll(s);
 let todayPanel = "meals";
+let expandedMealKey = null;
+const MEAL_TIME_MINUTES = { early:450, breakfast:510, midam:690, lunch:810, evening:1020, dinner:1200 };
 
 function setTodayPanel(panel){
   todayPanel = panel;
   $$(".today-mode").forEach(b=>b.classList.toggle("active", b.dataset.todayPanel===panel));
   $$(".today-panel").forEach(p=>p.classList.toggle("active", p.dataset.panel===panel));
+}
+
+function nearestMealKey(){
+  const now=new Date();
+  const mins=now.getHours()*60+now.getMinutes();
+  let bestKey=MEAL_SLOTS[0].key, bestDiff=Infinity;
+  MEAL_SLOTS.forEach(slot=>{
+    const diff=Math.abs((MEAL_TIME_MINUTES[slot.key]||0)-mins);
+    if(diff<bestDiff){ bestDiff=diff; bestKey=slot.key; }
+  });
+  return bestKey;
 }
 
 function renderToday(){
@@ -575,23 +603,34 @@ function renderToday(){
 
   // meals
   const ml = $("#mealList"); ml.innerHTML="";
+  const nearestKey = nearestMealKey();
   plan.meals.forEach(m=>{
     const key="meal_"+m.key;
     const st=log.items[key]||"";
+    const expanded = expandedMealKey===key;
+    const isNearest = m.key===nearestKey;
     const el=document.createElement("div");
-    el.className="item"+(m.cheat?" cheat":"")+(st?(" "+st):"");
+    el.className="item meal-card"+(expanded?" expanded":" collapsed")+(isNearest?" nearest":"")+(m.cheat?" cheat":"")+(st?(" "+st):"");
+    el.dataset.mealKey=key;
     el.innerHTML=`
       <div class="tick" data-k="${key}" data-cycle="1"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
       <div class="body">
-        <div class="when"><span>${m.label}</span><span class="cal">${m.cal?m.cal+" kcal":"enjoy!"}</span></div>
-        <div class="food">${m.food}</div>
-        <div class="benefit">${m.benefit}</div>
-        <div class="stags">
-          <span class="stag ${st==='done'?'on-done':''}" data-k="${key}" data-s="done">✓ Done</span>
-          <span class="stag ${st==='mod'?'on-mod':''}" data-k="${key}" data-s="mod">✎ Modified</span>
-          <span class="stag ${st==='skip'?'on-skip':''}" data-k="${key}" data-s="skip">✕ Skip</span>
+        <div class="meal-head">
+          <div class="meal-title">
+            <div class="when"><span>${m.label}</span><span class="cal">${m.cal?m.cal+" kcal":"enjoy!"}</span></div>
+          </div>
+          <div class="meal-status">${isNearest?'<span class="now-chip">Nearest</span>':''}<span class="chev">⌄</span></div>
         </div>
-        <textarea class="modnote" data-k="${key}" placeholder="What did you actually have?">${log.notes[key]||""}</textarea>
+        <div class="meal-details">
+          <div class="food">${m.food}</div>
+          <div class="benefit">${m.benefit}</div>
+          <div class="stags">
+            <span class="stag ${st==='done'?'on-done':''}" data-k="${key}" data-s="done">✓ Done</span>
+            <span class="stag ${st==='mod'?'on-mod':''}" data-k="${key}" data-s="mod">✎ Modified</span>
+            <span class="stag ${st==='skip'?'on-skip':''}" data-k="${key}" data-s="skip">✕ Skip</span>
+          </div>
+          <textarea class="modnote" data-k="${key}" placeholder="What did you actually have?">${log.notes[key]||""}</textarea>
+        </div>
       </div>`;
     ml.appendChild(el);
   });
@@ -718,21 +757,31 @@ function bestStreak(){
 /* ================= TODAY EVENT BINDING ================= */
 function bindTodayEvents(iso){
   const log=getLog(iso);
+  // collapsed meal rows
+  $$(".meal-card").forEach(card=>card.onclick=()=>{
+    expandedMealKey = expandedMealKey===card.dataset.mealKey ? null : card.dataset.mealKey;
+    renderToday();
+  });
   // ticks (cycle done->skip->none for meals/supplement)
-  $$(".tick[data-cycle]").forEach(t=>t.onclick=()=>{
+  $$(".tick[data-cycle]").forEach(t=>t.onclick=(e)=>{
+    e.stopPropagation();
     const k=t.dataset.k; const cur=log.items[k];
     const next = cur==="done"?"skip":cur==="skip"?undefined:"done";
     if(next) log.items[k]=next; else delete log.items[k];
     setLog(iso,log); renderToday(); haptic();
   });
   // status tags
-  $$(".stag").forEach(s=>s.onclick=()=>{
+  $$(".stag").forEach(s=>s.onclick=(e)=>{
+    e.stopPropagation();
     const k=s.dataset.k, st=s.dataset.s;
     if(log.items[k]===st) delete log.items[k]; else log.items[k]=st;
     setLog(iso,log); renderToday(); haptic();
   });
   // mod notes
-  $$(".modnote").forEach(t=>t.oninput=()=>{ log.notes[t.dataset.k]=t.value; setLog(iso,log); });
+  $$(".modnote").forEach(t=>{
+    t.onclick=e=>e.stopPropagation();
+    t.oninput=()=>{ log.notes[t.dataset.k]=t.value; setLog(iso,log); };
+  });
   // water dots
   $$("#waterDots .drop").forEach(d=>d.onclick=()=>{
     const i=+d.dataset.i; log.water = (log.water===i)? i-1 : i; setLog(iso,log); renderToday(); haptic();
@@ -751,9 +800,9 @@ function bindTodayEvents(iso){
 function haptic(){ if(navigator.vibrate) navigator.vibrate(8); }
 
 /* ================= NAV ================= */
-$("#prevDay").onclick=()=>{ viewDay=clampDay(viewDay-1); renderToday(); };
-$("#nextDay").onclick=()=>{ viewDay=clampDay(viewDay+1); renderToday(); };
-$("#jumpToday").onclick=()=>{ viewDay=clampDay(dayNumFor(todayISO())); renderToday(); toast("Jumped to today"); };
+$("#prevDay").onclick=()=>{ viewDay=clampDay(viewDay-1); expandedMealKey=null; renderToday(); };
+$("#nextDay").onclick=()=>{ viewDay=clampDay(viewDay+1); expandedMealKey=null; renderToday(); };
+$("#jumpToday").onclick=()=>{ viewDay=clampDay(dayNumFor(todayISO())); expandedMealKey=null; renderToday(); toast("Jumped to today"); };
 $$(".today-mode").forEach(b=>b.onclick=()=>setTodayPanel(b.dataset.todayPanel));
 
 $$(".tab").forEach(t=>t.onclick=()=>{
