@@ -347,8 +347,16 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
       <label>Start date (Day 1)</label>
       <input class="numin" id="startDate" type="date" style="width:100%;text-align:left">
     </div>
-    <div class="sec"><h2>Meal times</h2><span class="hint">nearest highlight</span></div>
-    <div id="mealTimeBox"></div>
+    <button class="coll-hd" id="mealTimeToggle" aria-expanded="false">
+      <div>
+        <span class="coll-title">Meal times</span>
+        <span class="coll-sub">nearest highlight</span>
+      </div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="coll-body" id="mealTimeBody">
+      <div id="mealTimeBox"></div>
+    </div>
 
     <button class="coll-hd" id="remToggle" aria-expanded="false">
       <div>
@@ -990,6 +998,11 @@ $("#enableNotif").onclick=async()=>{
 $("#remToggle").onclick=function(){
   const open=this.classList.toggle("open");
   $("#remBody").classList.toggle("open",open);
+  this.setAttribute("aria-expanded",open);
+};
+$("#mealTimeToggle").onclick=function(){
+  const open=this.classList.toggle("open");
+  $("#mealTimeBody").classList.toggle("open",open);
   this.setAttribute("aria-expanded",open);
 };
 // lightweight in-session reminder scheduling (fires while app/tab is open)
