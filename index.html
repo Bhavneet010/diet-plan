@@ -157,14 +157,11 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
 .workout li:first-child{border-top:none}
 .workout li:before{content:"";position:absolute;left:2px;top:12px;width:6px;height:6px;border-radius:50%;background:var(--sage)}
 
-/* glow log */
-.glowlog{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow-sm)}
-.glowrow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line)}
-.glowrow:first-child{border-top:none}
-.glowrow .gl{font-size:13.5px;color:var(--ink-soft)}
-.stars{display:flex;gap:4px}
-.star{font-size:20px;color:var(--line);cursor:pointer;transition:.1s;line-height:1}
-.star.on{color:var(--gold)}
+/* meal time settings */
+.time-row{display:grid;grid-template-columns:minmax(0,1fr) 116px;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow-sm)}
+.time-row label{font-size:14px;color:var(--ink-soft);margin:0}
+.time-row input{width:100%;text-align:center}
 
 /* bottom nav */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;
@@ -350,6 +347,8 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
       <label>Start date (Day 1)</label>
       <input class="numin" id="startDate" type="date" style="width:100%;text-align:left">
     </div>
+    <div class="sec"><h2>Meal times</h2><span class="hint">nearest highlight</span></div>
+    <div id="mealTimeBox"></div>
 
     <button class="coll-hd" id="remToggle" aria-expanded="false">
       <div>
@@ -410,12 +409,12 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
    ============================================================ */
 
 const MEAL_SLOTS = [
-  { key: "early",     label: "Early (7:30)",     cal: 90  },
-  { key: "breakfast", label: "Breakfast (8:30)", cal: 0   }, // cal filled per template
-  { key: "midam",     label: "Mid-AM (11:30)",   cal: 120 },
-  { key: "lunch",     label: "Lunch (1:30)",     cal: 450 },
-  { key: "evening",   label: "Evening (5:00)",   cal: 140 },
-  { key: "dinner",    label: "Dinner (8:00)",    cal: 320 },
+  { key: "early",     label: "Early",     time: "07:30", cal: 90  },
+  { key: "breakfast", label: "Breakfast", time: "08:30", cal: 0   }, // cal filled per template
+  { key: "midam",     label: "Mid-AM",    time: "11:30", cal: 120 },
+  { key: "lunch",     label: "Lunch",     time: "13:30", cal: 450 },
+  { key: "evening",   label: "Evening",   time: "17:00", cal: 140 },
+  { key: "dinner",    label: "Dinner",    time: "20:00", cal: 320 },
 ];
 
 const BREAKFAST_CAL = [320, 300, 290, 290, 300, 300, 360];
@@ -567,12 +566,15 @@ const LS = {
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
   del(k){ localStorage.removeItem(k); }
 };
-const SETTINGS = LS.get("gp_settings", { startDate: todayISO(), reminders:{} });
+const DEFAULT_MEAL_TIMES = Object.fromEntries(MEAL_SLOTS.map(slot => [slot.key, slot.time]));
+const SETTINGS = LS.get("gp_settings", { startDate: todayISO(), reminders:{}, mealTimes:{...DEFAULT_MEAL_TIMES} });
+SETTINGS.reminders = SETTINGS.reminders || {};
+SETTINGS.mealTimes = {...DEFAULT_MEAL_TIMES, ...(SETTINGS.mealTimes || {})};
 function saveSettings(){ LS.set("gp_settings", SETTINGS); }
 
-// per-day log: gp_log_<ISO> = {items:{key:'done'|'mod'|'skip'}, notes:{key:str}, water:n, steps:n, sleep:n, glow:{skin,energy,mood}}
+// per-day log: gp_log_<ISO> = {items:{key:'done'|'mod'|'skip'}, notes:{key:str}, water:n, steps:n, sleep:n}
 function logKey(iso){ return "gp_log_"+iso; }
-function getLog(iso){ return LS.get(logKey(iso), {items:{},notes:{},water:0,steps:0,sleep:0,glow:{}}); }
+function getLog(iso){ return LS.get(logKey(iso), {items:{},notes:{},water:0,steps:0,sleep:0}); }
 function setLog(iso, log){ LS.set(logKey(iso), log); }
 
 // weights: gp_weights = [{iso, kg}]
@@ -597,7 +599,12 @@ const $ = (s)=>document.querySelector(s);
 const $$ = (s)=>document.querySelectorAll(s);
 let todayPanel = "meals";
 let expandedMealKey = null;
-const MEAL_TIME_MINUTES = { early:450, breakfast:510, midam:690, lunch:810, evening:1020, dinner:1200 };
+
+function mealTimeFor(key){ return SETTINGS.mealTimes?.[key] || DEFAULT_MEAL_TIMES[key] || "00:00"; }
+function minutesFromTime(value){
+  const [h,m] = String(value || "00:00").split(":").map(Number);
+  return (Number.isFinite(h)?h:0)*60 + (Number.isFinite(m)?m:0);
+}
 
 function setTodayPanel(panel){
   todayPanel = panel;
@@ -610,7 +617,7 @@ function nearestMealKey(){
   const mins=now.getHours()*60+now.getMinutes();
   let bestKey=MEAL_SLOTS[0].key, bestDiff=Infinity;
   MEAL_SLOTS.forEach(slot=>{
-    const diff=Math.abs((MEAL_TIME_MINUTES[slot.key]||0)-mins);
+    const diff=Math.abs(minutesFromTime(mealTimeFor(slot.key))-mins);
     if(diff<bestDiff){ bestDiff=diff; bestKey=slot.key; }
   });
   return bestKey;
@@ -632,6 +639,7 @@ function renderToday(){
     const st=log.items[key]||"";
     const expanded = expandedMealKey===key;
     const isNearest = m.key===nearestKey;
+    const mealTime = mealTimeFor(m.key);
     const el=document.createElement("div");
     el.className="item meal-card"+(expanded?" expanded":" collapsed")+(isNearest?" nearest":"")+(m.cheat?" cheat":"")+(st?(" "+st):"");
     el.dataset.mealKey=key;
@@ -640,7 +648,7 @@ function renderToday(){
       <div class="body">
         <div class="meal-head">
           <div class="meal-title">
-            <div class="when"><span>${m.label}</span><span class="cal">${m.cal?m.cal+" kcal":"enjoy!"}</span></div>
+            <div class="when"><span>${m.label} · ${mealTime}</span><span class="cal">${m.cal?m.cal+" kcal":"enjoy!"}</span></div>
           </div>
           <div class="meal-status">${isNearest?'<span class="now-chip">Nearest</span>':''}<span class="chev">⌄</span></div>
         </div>
@@ -933,15 +941,19 @@ const REMINDERS=[
   {id:"logday",label:"Log your day",time:"21:30",desc:"Tick off what you did"},
   {id:"weighin",label:"Weekly weigh-in",time:"07:30",desc:"Sunday mornings"},
 ];
+function reminderTime(r){ return SETTINGS.mealTimes?.[r.id] || r.time; }
 function renderMore(){
   const rb=$("#remBox"); rb.innerHTML="";
   REMINDERS.forEach(r=>{
     const on=!!SETTINGS.reminders[r.id];
+    const originalReminderTime=r.time;
+    r.time=reminderTime(r);
     const el=document.createElement("div");
     el.className="remrow";
     el.innerHTML=`<div class="rl">${r.label} · ${r.time}<small>${r.desc}</small></div>
       <div class="switch ${on?'on':''}" data-r="${r.id}"></div>`;
     rb.appendChild(el);
+    r.time=originalReminderTime;
   });
   $$(".switch[data-r]").forEach(s=>s.onclick=()=>{
     const id=s.dataset.r;
@@ -949,6 +961,23 @@ function renderMore(){
     if(SETTINGS.reminders[id]) scheduleReminders();
   });
   $("#startDate").value=SETTINGS.startDate;
+  const mb=$("#mealTimeBox");
+  if(mb){
+    mb.innerHTML=MEAL_SLOTS.map(slot=>`
+      <div class="time-row">
+        <label for="mealTime-${slot.key}">${slot.label}</label>
+        <input class="numin meal-time-in" id="mealTime-${slot.key}" data-meal-time="${slot.key}" type="time" value="${mealTimeFor(slot.key)}">
+      </div>`).join("");
+    $$(".meal-time-in").forEach(input=>input.onchange=()=>{
+      SETTINGS.mealTimes[input.dataset.mealTime]=input.value || DEFAULT_MEAL_TIMES[input.dataset.mealTime];
+      saveSettings();
+      expandedMealKey=null;
+      renderToday();
+      scheduleReminders();
+      renderMore();
+      toast("Meal time updated");
+    });
+  }
 }
 $("#startDate").onchange=(e)=>{ if(e.target.value){ SETTINGS.startDate=e.target.value; saveSettings(); viewDay=clampDay(dayNumFor(todayISO())); renderToday(); toast("Start date updated"); } };
 
@@ -971,7 +1000,7 @@ function scheduleReminders(){
   const now=new Date();
   REMINDERS.forEach(r=>{
     if(!SETTINGS.reminders[r.id]) return;
-    const [h,mi]=r.time.split(":").map(Number);
+    const [h,mi]=reminderTime(r).split(":").map(Number);
     const fire=new Date(); fire.setHours(h,mi,0,0);
     if(fire<=now) fire.setDate(fire.getDate()+1);
     const ms=fire-now;
@@ -986,12 +1015,12 @@ function scheduleReminders(){
 
 /* ================= EXPORT / IMPORT / RESET ================= */
 $("#exportCsv").onclick=()=>{
-  let rows=[["Day","Date","Weekday","Adherence%","Workout","Water","Steps","Sleep","Skin","Energy","Mood","Notes"]];
+  let rows=[["Day","Date","Weekday","Adherence%","Workout","Water","Steps","Sleep","Notes"]];
   for(let d=1; d<=90; d++){
     const iso=isoForDayNum(d); const lg=getLog(iso); const s=dayScore(iso); const pl=getDayPlan(d);
     const notes=Object.entries(lg.notes||{}).map(([k,v])=>v?`${k}:${v}`:"").filter(Boolean).join(" | ");
     rows.push([d,iso,pl.weekday,s?s.pct:0,lg.items.workout||"",lg.water||0,lg.steps||0,lg.sleep||0,
-      (lg.glow||{}).skin||"",(lg.glow||{}).energy||"",(lg.glow||{}).mood||"",`"${notes.replace(/"/g,"'")}"`]);
+      `"${notes.replace(/"/g,"'")}"`]);
   }
   const w=getWeights();
   rows.push([]); rows.push(["Weight log"]); rows.push(["Date","kg"]); w.forEach(e=>rows.push([e.iso,e.kg]));
