@@ -167,6 +167,15 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
   0%{transform:translateY(0) scale(1);opacity:.8}
   65%{opacity:.3}
   100%{transform:translateY(-50px) scale(.25);opacity:0}}
+.wfish-wrap{position:absolute;pointer-events:none;z-index:1}
+.wfish-wrap.ltr{animation:fishLtr linear infinite}
+.wfish-wrap.rtl{animation:fishRtl linear infinite}
+.wfish{font-size:11px;display:inline-block;line-height:1}
+.wfish-wrap.rtl .wfish{transform:scaleX(-1)}
+@keyframes fishLtr{
+  0%{left:-24px;opacity:0} 7%{opacity:.9} 93%{opacity:.9} 100%{left:calc(100% + 24px);opacity:0}}
+@keyframes fishRtl{
+  0%{left:calc(100% + 24px);opacity:0} 7%{opacity:.9} 93%{opacity:.9} 100%{left:-24px;opacity:0}}
 .water-bar-lbl{position:absolute;inset:0;display:flex;align-items:center;
   justify-content:center;gap:2px;pointer-events:none;z-index:2}
 .water-bar-lbl .wval{font-family:var(--fdisp);font-size:18px;font-weight:600;transition:color .18s;
@@ -760,6 +769,12 @@ function renderToday(){
           <span class="wbubble" style="left:85%;bottom:8px;width:4px;height:4px;animation-delay:.1s;animation-duration:2.3s"></span>
           <span class="wbubble" style="left:90%;bottom:6px;width:6px;height:6px;animation-delay:1.5s;animation-duration:2.6s"></span>
           <span class="wbubble" style="left:95%;bottom:3px;width:3px;height:3px;animation-delay:.9s;animation-duration:1.9s"></span>
+          <span class="wfish-wrap ltr" style="top:7px;animation-duration:7.5s;animation-delay:0s"><span class="wfish">🐟</span></span>
+          <span class="wfish-wrap rtl" style="top:24px;animation-duration:5.8s;animation-delay:1.9s"><span class="wfish">🐠</span></span>
+          <span class="wfish-wrap ltr" style="top:17px;animation-duration:10s;animation-delay:3.3s"><span class="wfish">🦑</span></span>
+          <span class="wfish-wrap rtl" style="top:5px;animation-duration:6.5s;animation-delay:0.7s"><span class="wfish">🐡</span></span>
+          <span class="wfish-wrap ltr" style="top:27px;animation-duration:8.5s;animation-delay:4.8s"><span class="wfish">🦐</span></span>
+          <span class="wfish-wrap rtl" style="top:13px;animation-duration:12s;animation-delay:2.4s"><span class="wfish">🐬</span></span>
         </div>
         <div class="water-bar-lbl">
           <span class="wval" id="waterVal" style="color:${wOver50?'#ffffff':'#1a5272'}">${waterLitres} L</span>
