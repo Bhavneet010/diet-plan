@@ -146,7 +146,9 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
 .numin{width:90px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
   font-family:var(--fbody);font-size:15px;padding:7px 10px;text-align:center}
 /* steps & sleep animated bars */
-.steps-bar,.sleep-bar{position:relative;height:46px;border-radius:14px;overflow:hidden;margin-top:10px;cursor:text}
+.steps-bar,.sleep-bar{position:relative;height:46px;border-radius:14px;overflow:hidden;margin-top:10px;cursor:ew-resize;touch-action:none;user-select:none}
+.steps-fill.wdrag,.sleep-fill.wdrag{transition:none}
+.tgt-val-in{cursor:text}
 .steps-bar{background:linear-gradient(135deg,#fff3e0,#ffe0b2);border:1.5px solid #ffcc80}
 .sleep-bar{background:linear-gradient(135deg,#ede7f6,#d1c4e9);border:1.5px solid #ce93d8}
 .steps-fill{position:absolute;left:0;top:0;bottom:0;overflow:hidden;
@@ -1023,9 +1025,47 @@ function bindTodayEvents(iso){
     wb.addEventListener("touchend",endDrag);
     updateWaterBar();
   }
-  // steps & sleep
+  // steps & sleep — typing
   const si=$("#stepsIn"); if(si) si.oninput=()=>{ log.steps=+si.value||0; setLog(iso,log); updateStepsBar(log); updateScore(iso); };
   const sl=$("#sleepIn"); if(sl) sl.oninput=()=>{ log.sleep=+sl.value||0; setLog(iso,log); updateSleepBar(log); updateScore(iso); };
+  // steps bar drag
+  const stepsBar=$("#stepsBar");
+  if(stepsBar){
+    const STEPS_MAX=Math.max(DAILY_TARGETS.steps*2,20000);
+    let sdrag=false,smoved=false,sx0=0;
+    function setStepsFromX(cx){
+      const r=stepsBar.getBoundingClientRect();
+      const v=Math.round(Math.max(0,Math.min(1,(cx-r.left)/r.width))*STEPS_MAX/100)*100;
+      log.steps=v; setLog(iso,log);
+      const inp=$("#stepsIn"); if(inp) inp.value=v||"";
+      updateStepsBar(log); updateScore(iso); haptic();
+    }
+    stepsBar.addEventListener("mousedown",e=>{ sdrag=true;smoved=false;sx0=e.clientX; $("#stepsFill")?.classList.add("wdrag"); });
+    stepsBar.addEventListener("mousemove",e=>{ if(!sdrag)return; if(Math.abs(e.clientX-sx0)>4){smoved=true;setStepsFromX(e.clientX);} });
+    document.addEventListener("mouseup",()=>{ if(!sdrag)return; sdrag=false; $("#stepsFill")?.classList.remove("wdrag"); if(!smoved) $("#stepsIn")?.focus(); });
+    stepsBar.addEventListener("touchstart",e=>{ sdrag=true;smoved=false;sx0=e.touches[0].clientX; $("#stepsFill")?.classList.add("wdrag"); },{passive:true});
+    stepsBar.addEventListener("touchmove",e=>{ if(!sdrag)return; if(Math.abs(e.touches[0].clientX-sx0)>4){smoved=true;setStepsFromX(e.touches[0].clientX);} },{passive:true});
+    stepsBar.addEventListener("touchend",()=>{ sdrag=false; $("#stepsFill")?.classList.remove("wdrag"); if(!smoved) $("#stepsIn")?.focus(); });
+  }
+  // sleep bar drag
+  const sleepBar=$("#sleepBar");
+  if(sleepBar){
+    const SLEEP_MAX=Math.max(DAILY_TARGETS.sleepHours*2,12);
+    let zd=false,zm=false,zx0=0;
+    function setSleepFromX(cx){
+      const r=sleepBar.getBoundingClientRect();
+      const v=Math.round(Math.max(0,Math.min(1,(cx-r.left)/r.width))*SLEEP_MAX*2)/2;
+      log.sleep=v; setLog(iso,log);
+      const inp=$("#sleepIn"); if(inp) inp.value=v||"";
+      updateSleepBar(log); updateScore(iso); haptic();
+    }
+    sleepBar.addEventListener("mousedown",e=>{ zd=true;zm=false;zx0=e.clientX; $("#sleepFill")?.classList.add("wdrag"); });
+    sleepBar.addEventListener("mousemove",e=>{ if(!zd)return; if(Math.abs(e.clientX-zx0)>4){zm=true;setSleepFromX(e.clientX);} });
+    document.addEventListener("mouseup",()=>{ if(!zd)return; zd=false; $("#sleepFill")?.classList.remove("wdrag"); if(!zm) $("#sleepIn")?.focus(); });
+    sleepBar.addEventListener("touchstart",e=>{ zd=true;zm=false;zx0=e.touches[0].clientX; $("#sleepFill")?.classList.add("wdrag"); },{passive:true});
+    sleepBar.addEventListener("touchmove",e=>{ if(!zd)return; if(Math.abs(e.touches[0].clientX-zx0)>4){zm=true;setSleepFromX(e.touches[0].clientX);} },{passive:true});
+    sleepBar.addEventListener("touchend",()=>{ zd=false; $("#sleepFill")?.classList.remove("wdrag"); if(!zm) $("#sleepIn")?.focus(); });
+  }
   updateStepsBar(log);
   updateSleepBar(log);
 }
