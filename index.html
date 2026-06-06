@@ -161,11 +161,21 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
   border-radius:12px 0 0 12px;transition:width .35s cubic-bezier(.25,1,.5,1)}
 .sleep-fill.znear{background:linear-gradient(135deg,#202c90,#0f1860)}
 .sleep-fill.zfull{border-radius:12px;background:linear-gradient(135deg,#1e35a8,#0d1e78)}
-/* steps — gentle pulse */
-.steps-fill{animation:stepsPulse 3s ease-in-out infinite}
-.steps-fill.snear{animation-duration:2s}
-.steps-fill.sfull{animation-duration:1.2s}
-@keyframes stepsPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
+/* steps — runner */
+.runner{position:absolute;right:3px;top:50%;transform:translateY(-50%);
+  font-size:24px;line-height:1;pointer-events:none;
+  animation:stepsRun .55s ease-in-out infinite}
+.steps-fill.snear .runner{animation-duration:.35s}
+.steps-fill.sfull .runner{animation:stepsCelebrate .7s ease-in-out infinite}
+@keyframes stepsRun{
+  0%,100%{transform:translateY(-50%)}
+  30%{transform:translateY(calc(-50% - 4px)) rotate(-5deg)}
+  70%{transform:translateY(calc(-50% + 2px)) rotate(3deg)}}
+@keyframes stepsCelebrate{
+  0%,100%{transform:translateY(-50%) scale(1) rotate(0deg)}
+  25%{transform:translateY(calc(-50% - 10px)) scale(1.2) rotate(-15deg)}
+  50%{transform:translateY(-50%) scale(1) rotate(0deg)}
+  75%{transform:translateY(calc(-50% - 7px)) scale(1.15) rotate(12deg)}}
 /* sleep — stars */
 .zstar{position:absolute;border-radius:50%;background:rgba(255,255,255,.9);
   box-shadow:0 0 3px rgba(210,200,255,.8);
@@ -826,6 +836,7 @@ function renderToday(){
       <div class="when"><span>Steps</span><span class="cal">target ${DAILY_TARGETS.steps.toLocaleString()}</span></div>
       <div class="steps-bar" id="stepsBar">
         <div class="steps-fill${stepsFull?' sfull':stepsNear?' snear':''}" id="stepsFill" style="width:${stepsPct}%">
+          <span class="runner" id="stepsRunner">${stepsFull?'🎊':'🏃‍♀️'}</span>
         </div>
         <div class="bar-lbl">
           <input class="tgt-val-in" id="stepsIn" type="number" inputmode="numeric" placeholder="0" value="${log.steps||""}" style="color:${stepsPct>50?'#fff':'#5d3a00'}">
@@ -863,13 +874,15 @@ function updateStepsBar(log){
   const fill=$("#stepsFill"); if(!fill) return;
   const pct=Math.min((log.steps/DAILY_TARGETS.steps)*100,100);
   fill.style.width=pct+"%";
-  fill.classList.toggle("snear",pct>=75&&pct<100);
-  fill.classList.toggle("sfull",log.steps>=DAILY_TARGETS.steps);
+  const full=log.steps>=DAILY_TARGETS.steps;
+  fill.classList.toggle("snear",pct>=75&&!full);
+  fill.classList.toggle("sfull",full);
+  const runner=$("#stepsRunner"); if(runner) runner.textContent=full?"🎊":"🏃‍♀️";
   const over=pct>50;
   const vi=$("#stepsIn"); if(vi) vi.style.color=over?"#fff":"#5d3a00";
   const vu=$("#stepsUnit"); if(vu) vu.style.color=over?"rgba(255,255,255,.8)":"rgba(93,58,0,.65)";
   const vs=$("#stepsState");
-  if(vs){ vs.textContent=log.steps>=DAILY_TARGETS.steps?"✓ hit":log.steps>=DAILY_TARGETS.steps*.6?"keep going":"";
+  if(vs){ vs.textContent=full?"✓ hit":pct>=60?"keep going":"";
     vs.style.color=over?"rgba(255,255,255,.68)":"var(--ink-dim)"; }
 }
 function updateSleepBar(log){
