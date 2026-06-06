@@ -150,43 +150,61 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
 .steps-fill.wdrag,.sleep-fill.wdrag{transition:none}
 .tgt-val-in{cursor:text}
 .steps-bar{background:linear-gradient(135deg,#fff3e0,#ffe0b2);border:1.5px solid #ffcc80}
-.sleep-bar{background:linear-gradient(135deg,#ede7f6,#d1c4e9);border:1.5px solid #ce93d8}
+.sleep-bar{background:linear-gradient(180deg,#090d26,#0f1435);border:1.5px solid #1a2158}
 .steps-fill{position:absolute;left:0;top:0;bottom:0;overflow:hidden;
   background:linear-gradient(135deg,#ffb74d,#f57c00);
   border-radius:12px 0 0 12px;transition:width .35s cubic-bezier(.25,1,.5,1)}
 .steps-fill.snear{background:linear-gradient(135deg,#ffa726,#ef6c00)}
 .steps-fill.sfull{border-radius:12px;background:linear-gradient(135deg,#66bb6a,#388e3c)}
 .sleep-fill{position:absolute;left:0;top:0;bottom:0;overflow:hidden;
-  background:linear-gradient(135deg,#9575cd,#5e35b1);
+  background:linear-gradient(135deg,#1a2272,#0d1450);
   border-radius:12px 0 0 12px;transition:width .35s cubic-bezier(.25,1,.5,1)}
-.sleep-fill.znear{background:linear-gradient(135deg,#8e24aa,#4a148c)}
-.sleep-fill.zfull{border-radius:12px;background:linear-gradient(135deg,#4527a0,#1a237e)}
-/* sparks */
-.spark{position:absolute;border-radius:50%;
-  background:rgba(255,230,70,.95);box-shadow:0 0 5px rgba(255,200,0,.8);
-  animation:sparkUp 2s ease-out infinite}
-.steps-fill.snear .spark{animation-duration:1.3s}
-.steps-fill.sfull .spark{animation-duration:.85s;
-  background:rgba(180,255,140,.95);box-shadow:0 0 5px rgba(80,230,60,.85)}
-@keyframes sparkUp{
-  0%{transform:translateY(0) scale(1);opacity:.95}
-  55%{opacity:.45}
-  100%{transform:translateY(-50px) scale(.08);opacity:0}}
-/* stars */
-.zstar{position:absolute;border-radius:50%;background:rgba(255,255,255,.88);
-  box-shadow:0 0 5px rgba(210,190,255,.8);
-  animation:starTwinkle 2s ease-in-out infinite alternate}
-.sleep-fill.znear .zstar{animation-duration:1.2s}
-.sleep-fill.zfull .zstar{animation-duration:.65s;box-shadow:0 0 9px rgba(255,255,160,.85)}
-@keyframes starTwinkle{from{transform:scale(1);opacity:.9}to{transform:scale(.15);opacity:.08}}
-/* ZZZs */
-.zzz{position:absolute;font-size:8px;font-weight:800;letter-spacing:-1px;
-  color:rgba(255,255,255,.7);animation:zUp 3s ease-out infinite}
-.sleep-fill.znear .zzz{animation-duration:2s}
-.sleep-fill.zfull .zzz{animation-duration:1.1s;color:rgba(255,255,150,.88)}
-@keyframes zUp{
-  0%{transform:translateY(0) scale(1) rotate(-8deg);opacity:.85}
-  100%{transform:translateY(-52px) scale(.3) rotate(18deg);opacity:0}}
+.sleep-fill.znear{background:linear-gradient(135deg,#202c90,#0f1860)}
+.sleep-fill.zfull{border-radius:12px;background:linear-gradient(135deg,#1e35a8,#0d1e78)}
+/* steps — scrolling speed lines */
+.steps-fill::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(90deg,
+    transparent 0px,transparent 13px,
+    rgba(255,255,255,.13) 13px,rgba(255,255,255,.13) 17px,
+    transparent 17px,transparent 30px,
+    rgba(255,255,255,.06) 30px,rgba(255,255,255,.06) 33px);
+  background-size:40px 100%;animation:speedScroll 1.5s linear infinite}
+.steps-fill.snear::after{animation-duration:.85s;
+  background-image:repeating-linear-gradient(90deg,
+    transparent 0px,transparent 10px,
+    rgba(255,255,255,.22) 10px,rgba(255,255,255,.22) 15px,
+    transparent 15px,transparent 27px,
+    rgba(255,255,255,.1) 27px,rgba(255,255,255,.1) 30px);
+  background-size:40px 100%}
+.steps-fill.sfull::after{animation-duration:.42s;
+  background-image:repeating-linear-gradient(90deg,
+    transparent 0px,transparent 8px,
+    rgba(180,255,130,.3) 8px,rgba(180,255,130,.3) 13px,
+    transparent 13px,transparent 23px,
+    rgba(180,255,130,.14) 23px,rgba(180,255,130,.14) 26px);
+  background-size:40px 100%}
+@keyframes speedScroll{from{background-position:0 0}to{background-position:40px 0}}
+/* sleep — stars */
+.zstar{position:absolute;border-radius:50%;background:rgba(255,255,255,.92);
+  box-shadow:0 0 3px rgba(210,200,255,.85);
+  animation:starTwinkle 2.4s ease-in-out infinite alternate}
+.sleep-fill.znear .zstar{animation-duration:1.4s;box-shadow:0 0 5px rgba(220,215,255,.95)}
+.sleep-fill.zfull .zstar{animation-duration:.75s;box-shadow:0 0 7px rgba(255,255,190,1)}
+@keyframes starTwinkle{from{transform:scale(1);opacity:.92}to{transform:scale(.12);opacity:.04}}
+/* moon */
+.moon{position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  border-radius:50%;overflow:hidden;
+  background:radial-gradient(circle at 38% 38%,#fff9e0,#ffe08a);
+  width:12px;height:12px;
+  box-shadow:0 0 6px rgba(255,232,80,.4);
+  transition:width .5s ease,height .5s ease,box-shadow .5s ease}
+.moon::before{content:'';position:absolute;inset:0;border-radius:50%;
+  background:#0d1245;transition:transform .5s ease;transform:translateX(-4px)}
+.sleep-fill.znear .moon{width:15px;height:15px;box-shadow:0 0 12px rgba(255,232,80,.65)}
+.sleep-fill.znear .moon::before{transform:translateX(0px)}
+.sleep-fill.zfull .moon{width:18px;height:18px;
+  box-shadow:0 0 20px rgba(255,232,80,.95),0 0 38px rgba(255,232,80,.28)}
+.sleep-fill.zfull .moon::before{transform:translateX(22px)}
 /* shared label overlay */
 .bar-lbl{position:absolute;inset:0;display:flex;align-items:center;
   justify-content:center;gap:3px;pointer-events:none;z-index:2}
@@ -826,20 +844,6 @@ function renderToday(){
       <div class="when"><span>Steps</span><span class="cal">target ${DAILY_TARGETS.steps.toLocaleString()}</span></div>
       <div class="steps-bar" id="stepsBar">
         <div class="steps-fill${stepsFull?' sfull':stepsNear?' snear':''}" id="stepsFill" style="width:${stepsPct}%">
-          <span class="spark" style="left:4%;bottom:5px;width:3px;height:3px;animation-delay:.1s"></span>
-          <span class="spark" style="left:10%;bottom:10px;width:5px;height:5px;animation-delay:.6s"></span>
-          <span class="spark" style="left:17%;bottom:4px;width:3px;height:3px;animation-delay:1.2s"></span>
-          <span class="spark" style="left:23%;bottom:8px;width:4px;height:4px;animation-delay:.35s"></span>
-          <span class="spark" style="left:30%;bottom:5px;width:3px;height:3px;animation-delay:1.55s"></span>
-          <span class="spark" style="left:37%;bottom:11px;width:5px;height:5px;animation-delay:.8s"></span>
-          <span class="spark" style="left:44%;bottom:4px;width:4px;height:4px;animation-delay:.2s"></span>
-          <span class="spark" style="left:51%;bottom:7px;width:3px;height:3px;animation-delay:1.3s"></span>
-          <span class="spark" style="left:57%;bottom:9px;width:5px;height:5px;animation-delay:.55s"></span>
-          <span class="spark" style="left:64%;bottom:4px;width:3px;height:3px;animation-delay:1.75s"></span>
-          <span class="spark" style="left:71%;bottom:6px;width:4px;height:4px;animation-delay:.4s"></span>
-          <span class="spark" style="left:78%;bottom:10px;width:5px;height:5px;animation-delay:1.0s"></span>
-          <span class="spark" style="left:85%;bottom:5px;width:3px;height:3px;animation-delay:.7s"></span>
-          <span class="spark" style="left:92%;bottom:8px;width:4px;height:4px;animation-delay:1.45s"></span>
         </div>
         <div class="bar-lbl">
           <input class="tgt-val-in" id="stepsIn" type="number" inputmode="numeric" placeholder="0" value="${log.steps||""}" style="color:${stepsPct>50?'#fff':'#5d3a00'}">
@@ -852,29 +856,28 @@ function renderToday(){
       <div class="when"><span>Sleep</span><span class="cal">target ${DAILY_TARGETS.sleepHours} h</span></div>
       <div class="sleep-bar" id="sleepBar">
         <div class="sleep-fill${sleepFull?' zfull':sleepNear?' znear':''}" id="sleepFill" style="width:${sleepPct}%">
-          <span class="zstar" style="left:5%;top:8px;width:4px;height:4px;animation-delay:0s"></span>
-          <span class="zstar" style="left:13%;top:16px;width:6px;height:6px;animation-delay:.6s"></span>
-          <span class="zstar" style="left:21%;top:6px;width:3px;height:3px;animation-delay:1.1s"></span>
-          <span class="zstar" style="left:29%;top:19px;width:5px;height:5px;animation-delay:.3s"></span>
-          <span class="zstar" style="left:37%;top:9px;width:4px;height:4px;animation-delay:1.5s"></span>
-          <span class="zstar" style="left:45%;top:14px;width:6px;height:6px;animation-delay:.85s"></span>
-          <span class="zstar" style="left:53%;top:7px;width:3px;height:3px;animation-delay:.2s"></span>
-          <span class="zstar" style="left:61%;top:18px;width:5px;height:5px;animation-delay:1.35s"></span>
-          <span class="zstar" style="left:69%;top:10px;width:4px;height:4px;animation-delay:.5s"></span>
-          <span class="zstar" style="left:77%;top:15px;width:6px;height:6px;animation-delay:1.7s"></span>
-          <span class="zstar" style="left:85%;top:8px;width:3px;height:3px;animation-delay:.95s"></span>
-          <span class="zstar" style="left:93%;top:13px;width:5px;height:5px;animation-delay:.15s"></span>
-          <span class="zzz" style="left:8%;bottom:3px;animation-delay:.2s">z</span>
-          <span class="zzz" style="left:22%;bottom:5px;animation-delay:1.0s">z</span>
-          <span class="zzz" style="left:36%;bottom:2px;animation-delay:.5s">z</span>
-          <span class="zzz" style="left:50%;bottom:6px;animation-delay:1.8s">z</span>
-          <span class="zzz" style="left:64%;bottom:3px;animation-delay:.9s">z</span>
-          <span class="zzz" style="left:78%;bottom:5px;animation-delay:.3s">z</span>
-          <span class="zzz" style="left:90%;bottom:2px;animation-delay:1.4s">z</span>
+          <span class="zstar" style="left:3%;top:7px;width:2px;height:2px;animation-delay:.3s"></span>
+          <span class="zstar" style="left:8%;top:17px;width:4px;height:4px;animation-delay:.9s"></span>
+          <span class="zstar" style="left:13%;top:5px;width:3px;height:3px;animation-delay:1.6s"></span>
+          <span class="zstar" style="left:18%;top:21px;width:2px;height:2px;animation-delay:.1s"></span>
+          <span class="zstar" style="left:23%;top:11px;width:3px;height:3px;animation-delay:1.2s"></span>
+          <span class="zstar" style="left:29%;top:4px;width:2px;height:2px;animation-delay:.55s"></span>
+          <span class="zstar" style="left:34%;top:18px;width:4px;height:4px;animation-delay:2.0s"></span>
+          <span class="zstar" style="left:40%;top:8px;width:3px;height:3px;animation-delay:.75s"></span>
+          <span class="zstar" style="left:46%;top:22px;width:2px;height:2px;animation-delay:1.4s"></span>
+          <span class="zstar" style="left:51%;top:6px;width:4px;height:4px;animation-delay:.2s"></span>
+          <span class="zstar" style="left:57%;top:16px;width:2px;height:2px;animation-delay:1.8s"></span>
+          <span class="zstar" style="left:62%;top:9px;width:3px;height:3px;animation-delay:.6s"></span>
+          <span class="zstar" style="left:68%;top:20px;width:2px;height:2px;animation-delay:1.1s"></span>
+          <span class="zstar" style="left:73%;top:5px;width:4px;height:4px;animation-delay:.4s"></span>
+          <span class="zstar" style="left:79%;top:14px;width:2px;height:2px;animation-delay:1.7s"></span>
+          <span class="zstar" style="left:84%;top:7px;width:3px;height:3px;animation-delay:.85s"></span>
+          <span class="zstar" style="left:89%;top:19px;width:2px;height:2px;animation-delay:.15s"></span>
+          <span class="moon"></span>
         </div>
         <div class="bar-lbl">
-          <input class="tgt-val-in" id="sleepIn" type="number" step="0.5" inputmode="decimal" placeholder="0" value="${log.sleep||""}" style="color:${sleepPct>50?'#fff':'#311b6e'}">
-          <span class="tgt-unit" id="sleepUnit" style="color:${sleepPct>50?'rgba(255,255,255,.78)':'rgba(49,27,110,.65)'}"> / ${DAILY_TARGETS.sleepHours}h</span>
+          <input class="tgt-val-in" id="sleepIn" type="number" step="0.5" inputmode="decimal" placeholder="0" value="${log.sleep||""}" style="color:#fff">
+          <span class="tgt-unit" id="sleepUnit" style="color:rgba(255,255,255,.7)"> / ${DAILY_TARGETS.sleepHours}h</span>
         </div>
       </div>
     </div></div>`;
@@ -904,9 +907,8 @@ function updateSleepBar(log){
   fill.style.width=pct+"%";
   fill.classList.toggle("znear",pct>=75&&pct<100);
   fill.classList.toggle("zfull",log.sleep>=DAILY_TARGETS.sleepHours);
-  const over=pct>50;
-  const vi=$("#sleepIn"); if(vi) vi.style.color=over?"#fff":"#311b6e";
-  const vu=$("#sleepUnit"); if(vu) vu.style.color=over?"rgba(255,255,255,.78)":"rgba(49,27,110,.65)";
+  const vi=$("#sleepIn"); if(vi) vi.style.color="#fff";
+  const vu=$("#sleepUnit"); if(vu) vu.style.color="rgba(255,255,255,.7)";
 }
 function stepsStateText(log){ updateStepsBar(log); }
 
@@ -1031,7 +1033,7 @@ function bindTodayEvents(iso){
   // steps bar drag
   const stepsBar=$("#stepsBar");
   if(stepsBar){
-    const STEPS_MAX=Math.max(DAILY_TARGETS.steps*2,20000);
+    const STEPS_MAX=DAILY_TARGETS.steps;
     let sdrag=false,smoved=false,sx0=0;
     function setStepsFromX(cx){
       const r=stepsBar.getBoundingClientRect();
@@ -1050,7 +1052,7 @@ function bindTodayEvents(iso){
   // sleep bar drag
   const sleepBar=$("#sleepBar");
   if(sleepBar){
-    const SLEEP_MAX=Math.max(DAILY_TARGETS.sleepHours*2,12);
+    const SLEEP_MAX=DAILY_TARGETS.sleepHours;
     let zd=false,zm=false,zx0=0;
     function setSleepFromX(cx){
       const r=sleepBar.getBoundingClientRect();
