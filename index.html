@@ -145,6 +145,12 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
 .cbtn:active{transform:scale(.92)}
 .numin{width:90px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
   font-family:var(--fbody);font-size:15px;padding:7px 10px;text-align:center}
+/* target input rows — same height/radius as water bar */
+.tgt-row{height:46px;display:flex;align-items:center;gap:10px;margin-top:10px;
+  padding:0 14px;background:var(--bg2);border:1.5px solid var(--line);border-radius:14px}
+.tgt-row input{background:transparent;border:none;flex:1;width:auto;padding:0;
+  color:var(--ink);font-family:var(--fbody);font-size:16px;font-weight:500;outline:none}
+.tgt-row input::placeholder{color:var(--ink-dim)}
 
 /* water bar */
 .water-bar-wrap{position:relative;height:46px;border-radius:14px;
@@ -769,15 +775,15 @@ function renderToday(){
     </div></div>
     <div class="item"><div class="body">
       <div class="when"><span>Steps</span><span class="cal">target ${DAILY_TARGETS.steps.toLocaleString()}</span></div>
-      <div class="counter" style="margin-top:9px">
-        <input class="numin" id="stepsIn" type="number" inputmode="numeric" placeholder="0" value="${log.steps||""}" style="flex:1;width:auto">
+      <div class="tgt-row">
+        <input id="stepsIn" type="number" inputmode="numeric" placeholder="0" value="${log.steps||""}">
         <span class="cal" id="stepsState"></span>
       </div>
     </div></div>
     <div class="item"><div class="body">
       <div class="when"><span>Sleep</span><span class="cal">target ${DAILY_TARGETS.sleepHours} h</span></div>
-      <div class="counter" style="margin-top:9px">
-        <input class="numin" id="sleepIn" type="number" step="0.5" inputmode="decimal" placeholder="hrs" value="${log.sleep||""}" style="flex:1;width:auto">
+      <div class="tgt-row">
+        <input id="sleepIn" type="number" step="0.5" inputmode="decimal" placeholder="hrs" value="${log.sleep||""}">
       </div>
     </div></div>`;
 
