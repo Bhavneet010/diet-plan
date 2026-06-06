@@ -147,32 +147,32 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
   font-family:var(--fbody);font-size:15px;padding:7px 10px;text-align:center}
 
 /* water bar */
-.water-bar-wrap{position:relative;height:68px;border-radius:20px;
+.water-bar-wrap{position:relative;height:46px;border-radius:14px;
   background:linear-gradient(135deg,#daeef5,#c2e3ef);border:1.5px solid #a6cfe0;
   overflow:hidden;cursor:pointer;user-select:none;touch-action:none;margin-top:10px}
 .water-fill{position:absolute;left:0;top:0;bottom:0;min-width:0;overflow:hidden;
   background:linear-gradient(135deg,#5bc8e8 0%,#30a0c8 55%,#1c80a8 100%);
-  border-radius:18px 0 0 18px;transition:width .22s cubic-bezier(.4,0,.2,1)}
-.water-fill.wfull{border-radius:18px}
-.water-shine{position:absolute;top:7px;left:12%;width:34%;height:32%;
-  background:rgba(255,255,255,.22);border-radius:50%;filter:blur(7px);pointer-events:none}
-.water-ripple{position:absolute;right:-2px;top:0;bottom:0;width:18px;
-  background:rgba(255,255,255,.18);filter:blur(4px);
-  animation:rippleEdge 1.6s ease-in-out infinite alternate}
-@keyframes rippleEdge{from{transform:scaleX(1) translateX(0)}to{transform:scaleX(1.8) translateX(4px)}}
-.wbubble{position:absolute;border-radius:50%;background:rgba(255,255,255,.38);
-  animation:bubUp 2.8s ease-in infinite}
+  border-radius:12px 0 0 12px;transition:width .35s cubic-bezier(.25,1,.5,1)}
+.water-fill.wdrag{transition:none}
+.water-fill.wfull{border-radius:12px}
+.water-shine{position:absolute;top:5px;left:10%;width:30%;height:45%;
+  background:rgba(255,255,255,.24);border-radius:50%;filter:blur(5px);pointer-events:none}
+.water-ripple{position:absolute;right:0;top:0;bottom:0;width:10px;
+  background:rgba(255,255,255,.22);filter:blur(3px);
+  animation:rippleEdge 2.4s ease-in-out infinite alternate}
+@keyframes rippleEdge{from{opacity:.7;width:8px}to{opacity:.15;width:14px}}
+.wbubble{position:absolute;border-radius:50%;background:rgba(255,255,255,.42);
+  animation:bubUp 2.4s cubic-bezier(.2,.8,.4,1) infinite}
 @keyframes bubUp{
-  0%{transform:translateY(0) scale(1);opacity:.75}
-  70%{opacity:.2}
-  100%{transform:translateY(-72px) scale(.35);opacity:0}}
+  0%{transform:translateY(0) scale(1);opacity:.8}
+  65%{opacity:.3}
+  100%{transform:translateY(-50px) scale(.25);opacity:0}}
 .water-bar-lbl{position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;gap:3px;pointer-events:none;z-index:2}
-.water-bar-lbl .wval{font-family:var(--fdisp);font-size:22px;font-weight:600;transition:color .2s;
-  text-shadow:0 1px 6px rgba(0,0,0,.08)}
-.water-bar-lbl .wtgt{font-size:13px;align-self:flex-end;padding-bottom:4px;transition:color .2s}
-.water-drag-hint{position:absolute;bottom:5px;right:11px;font-size:10px;
-  color:rgba(90,150,180,.7);pointer-events:none;z-index:3;letter-spacing:.3px}
+  justify-content:center;gap:2px;pointer-events:none;z-index:2}
+.water-bar-lbl .wval{font-family:var(--fdisp);font-size:18px;font-weight:600;transition:color .18s;
+  text-shadow:0 1px 4px rgba(0,0,0,.07)}
+.water-bar-lbl .wtgt{font-size:12px;transition:color .18s;padding-top:2px}
+.water-drag-hint{display:none}
 
 /* workout list */
 .workout{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow-sm)}
@@ -731,7 +731,6 @@ function renderToday(){
           <span class="wval" id="waterVal" style="color:${wOver50?'#ffffff':'#1a5272'}">${waterLitres} L</span>
           <span class="wtgt" style="color:${wOver50?'rgba(255,255,255,.78)':'rgba(26,82,114,.65)'}"> / ${DAILY_TARGETS.water} L</span>
         </div>
-        <span class="water-drag-hint">drag ←→</span>
       </div>
     </div></div>
     <div class="item"><div class="body">
@@ -864,12 +863,14 @@ function bindTodayEvents(iso){
       const hint=wb.querySelector(".water-drag-hint");
       if(hint) hint.style.opacity=over50?"1":"0.5";
     }
-    wb.addEventListener("mousedown",e=>{dragging=true;setWaterFromX(e.clientX);});
+    function startDrag(x){ dragging=true; const f=$("#waterFill"); f&&f.classList.add("wdrag"); setWaterFromX(x); }
+    function endDrag(){ dragging=false; const f=$("#waterFill"); f&&f.classList.remove("wdrag"); }
+    wb.addEventListener("mousedown",e=>{startDrag(e.clientX);});
     wb.addEventListener("mousemove",e=>{if(dragging)setWaterFromX(e.clientX);});
-    document.addEventListener("mouseup",()=>{dragging=false;});
-    wb.addEventListener("touchstart",e=>{dragging=true;setWaterFromX(e.touches[0].clientX);},{passive:true});
+    document.addEventListener("mouseup",endDrag);
+    wb.addEventListener("touchstart",e=>{startDrag(e.touches[0].clientX);},{passive:true});
     wb.addEventListener("touchmove",e=>{if(dragging)setWaterFromX(e.touches[0].clientX);},{passive:true});
-    wb.addEventListener("touchend",()=>{dragging=false;});
+    wb.addEventListener("touchend",endDrag);
     updateWaterBar();
   }
   // steps & sleep
