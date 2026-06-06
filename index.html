@@ -383,6 +383,28 @@ nav.tabs .row{max-width:520px;margin:0 auto;display:flex;justify-content:space-a
       <div id="mealTimeBox"></div>
     </div>
 
+    <button class="coll-hd" id="targetsToggle" aria-expanded="false">
+      <div>
+        <span class="coll-title">Daily targets</span>
+        <span class="coll-sub">water, steps &amp; sleep</span>
+      </div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="coll-body" id="targetsBody">
+      <div class="time-row">
+        <label for="targWater">Water target (L)</label>
+        <input class="numin" id="targWater" type="number" step="0.1" min="0.5" max="5" placeholder="2.5">
+      </div>
+      <div class="time-row">
+        <label for="targSteps">Steps target</label>
+        <input class="numin" id="targSteps" type="number" step="500" min="1000" max="30000" placeholder="8000">
+      </div>
+      <div class="time-row">
+        <label for="targSleep">Sleep target (h)</label>
+        <input class="numin" id="targSleep" type="number" step="0.5" min="4" max="14" placeholder="7.5">
+      </div>
+    </div>
+
     <button class="coll-hd" id="remToggle" aria-expanded="false">
       <div>
         <span class="coll-title">Reminders</span>
@@ -533,12 +555,8 @@ const CHEAT_MEALS = {
 
 const WD_NAME = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-// Targets that apply every day (the non-meal, non-workout checklist items)
-const DAILY_TARGETS = {
-  water: 2.5,       // litres
-  steps: 8000,
-  sleepHours: 7.5,
-};
+// Default targets — overridden by SETTINGS.targets loaded from localStorage below
+const DEFAULT_TARGETS = { water: 2.5, steps: 8000, sleepHours: 7.5 };
 
 // Weight trajectory: 52.5 -> 49 over 90 days (even, ~0.3kg/week)
 const WEIGHT_START = 52.5;
@@ -601,6 +619,8 @@ const DEFAULT_MEAL_TIMES = Object.fromEntries(MEAL_SLOTS.map(slot => [slot.key, 
 const SETTINGS = LS.get("gp_settings", { startDate: todayISO(), reminders:{}, mealTimes:{...DEFAULT_MEAL_TIMES} });
 SETTINGS.reminders = SETTINGS.reminders || {};
 SETTINGS.mealTimes = {...DEFAULT_MEAL_TIMES, ...(SETTINGS.mealTimes || {})};
+SETTINGS.targets = {...DEFAULT_TARGETS, ...(SETTINGS.targets || {})};
+const DAILY_TARGETS = SETTINGS.targets; // live alias — mutations here persist via saveSettings()
 function saveSettings(){ LS.set("gp_settings", SETTINGS); }
 
 // per-day log: gp_log_<ISO> = {items:{key:'done'|'mod'|'skip'}, notes:{key:str}, water:n, steps:n, sleep:n}
@@ -1027,6 +1047,14 @@ function renderMore(){
     if(SETTINGS.reminders[id]) scheduleReminders();
   });
   $("#startDate").value=SETTINGS.startDate;
+  // daily targets inputs
+  const tw=$("#targWater"),ts=$("#targSteps"),tsl=$("#targSleep");
+  if(tw){ tw.value=DAILY_TARGETS.water;
+    tw.onchange=()=>{ const v=parseFloat(tw.value); if(v>=0.5&&v<=5){ DAILY_TARGETS.water=v; saveSettings(); renderToday(); toast("Water target updated"); } else tw.value=DAILY_TARGETS.water; }; }
+  if(ts){ ts.value=DAILY_TARGETS.steps;
+    ts.onchange=()=>{ const v=parseInt(ts.value); if(v>=1000&&v<=30000){ DAILY_TARGETS.steps=v; saveSettings(); renderToday(); toast("Steps target updated"); } else ts.value=DAILY_TARGETS.steps; }; }
+  if(tsl){ tsl.value=DAILY_TARGETS.sleepHours;
+    tsl.onchange=()=>{ const v=parseFloat(tsl.value); if(v>=4&&v<=14){ DAILY_TARGETS.sleepHours=v; saveSettings(); renderToday(); toast("Sleep target updated"); } else tsl.value=DAILY_TARGETS.sleepHours; }; }
   const mb=$("#mealTimeBox");
   if(mb){
     mb.innerHTML=MEAL_SLOTS.map(slot=>`
@@ -1061,6 +1089,11 @@ $("#remToggle").onclick=function(){
 $("#mealTimeToggle").onclick=function(){
   const open=this.classList.toggle("open");
   $("#mealTimeBody").classList.toggle("open",open);
+  this.setAttribute("aria-expanded",open);
+};
+$("#targetsToggle").onclick=function(){
+  const open=this.classList.toggle("open");
+  $("#targetsBody").classList.toggle("open",open);
   this.setAttribute("aria-expanded",open);
 };
 // lightweight in-session reminder scheduling (fires while app/tab is open)
