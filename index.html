@@ -161,16 +161,11 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
   border-radius:12px 0 0 12px;transition:width .35s cubic-bezier(.25,1,.5,1)}
 .sleep-fill.znear{background:linear-gradient(135deg,#202c90,#0f1860)}
 .sleep-fill.zfull{border-radius:12px;background:linear-gradient(135deg,#1e35a8,#0d1e78)}
-/* steps — SVG runner */
+/* steps — goal SVG figure */
 .runner-svg{position:absolute;right:4px;top:50%;width:18px;height:34px;
-  pointer-events:none;overflow:visible;
-  animation:runBounce .48s ease-in-out infinite;
-  filter:drop-shadow(0 0 2px rgba(255,255,255,.4))}
-.steps-fill.snear .runner-svg{animation-duration:.32s}
-.steps-fill.sfull .runner-svg{animation:celebJump .65s ease-in-out infinite}
-@keyframes runBounce{
-  0%,100%{transform:translateY(-50%)}
-  50%{transform:translateY(calc(-50% - 3px))}}
+  pointer-events:none;overflow:visible;display:none;
+  filter:drop-shadow(0 0 3px rgba(255,255,255,.5))}
+.steps-fill.sfull .runner-svg{display:block;animation:celebJump .65s ease-in-out infinite}
 @keyframes celebJump{
   0%,100%{transform:translateY(-50%) scale(1)}
   30%{transform:translateY(calc(-50% - 9px)) scale(1.1)}
@@ -837,23 +832,12 @@ function renderToday(){
       <div class="steps-bar" id="stepsBar">
         <div class="steps-fill${stepsFull?' sfull':stepsNear?' snear':''}" id="stepsFill" style="width:${stepsPct}%">
           <svg class="runner-svg" id="stepsRunner" viewBox="0 0 20 36" xmlns="http://www.w3.org/2000/svg" stroke="rgba(255,255,255,.92)" stroke-linecap="round" stroke-width="2.2" fill="none">
-            <g class="rpose">
-              <circle cx="10" cy="4" r="3" fill="rgba(255,255,255,.92)" stroke="none"/>
-              <line x1="10" y1="7" x2="9" y2="19"/>
-              <line x1="10" y1="11" x2="4" y2="17"/>
-              <line x1="10" y1="11" x2="16" y2="14"/>
-              <line x1="9" y1="19" x2="3" y2="30"/>
-              <line x1="9" y1="19" x2="15" y2="26"/>
-              <line x1="15" y1="26" x2="12" y2="21"/>
-            </g>
-            <g class="cpose" style="display:none">
-              <circle cx="10" cy="4" r="3" fill="rgba(255,255,255,.92)" stroke="none"/>
-              <line x1="10" y1="7" x2="10" y2="19"/>
-              <line x1="10" y1="12" x2="3" y2="5"/>
-              <line x1="10" y1="12" x2="17" y2="5"/>
-              <line x1="10" y1="19" x2="4" y2="30"/>
-              <line x1="10" y1="19" x2="16" y2="30"/>
-            </g>
+            <circle cx="10" cy="4" r="3" fill="rgba(255,255,255,.92)" stroke="none"/>
+            <line x1="10" y1="7" x2="10" y2="19"/>
+            <line x1="10" y1="12" x2="3" y2="5"/>
+            <line x1="10" y1="12" x2="17" y2="5"/>
+            <line x1="10" y1="19" x2="4" y2="30"/>
+            <line x1="10" y1="19" x2="16" y2="30"/>
           </svg>
         </div>
         <div class="bar-lbl">
@@ -895,8 +879,6 @@ function updateStepsBar(log){
   const full=log.steps>=DAILY_TARGETS.steps;
   fill.classList.toggle("snear",pct>=75&&!full);
   fill.classList.toggle("sfull",full);
-  const runner=$("#stepsRunner");
-  if(runner){ runner.querySelector(".rpose").style.display=full?"none":""; runner.querySelector(".cpose").style.display=full?"":"none"; }
   const over=pct>50;
   const vi=$("#stepsIn"); if(vi) vi.style.color=over?"#fff":"#5d3a00";
   const vu=$("#stepsUnit"); if(vu) vu.style.color=over?"rgba(255,255,255,.8)":"rgba(93,58,0,.65)";
