@@ -138,16 +138,41 @@ header.app{padding:max(18px,env(safe-area-inset-top)) 0 8px}
 .item.mod .modnote{display:block}
 .meal-card.collapsed .modnote{display:none}
 
-/* counters (water/steps) */
+/* counters (steps/sleep) */
 .counter{display:flex;align-items:center;gap:12px}
-.counter .dots{display:flex;gap:5px;flex-wrap:wrap;flex:1}
-.drop{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);cursor:pointer;transition:.15s}
-.drop.full{background:linear-gradient(160deg,#8ac3d7,#5aaac8);border-color:#5aaac8}
 .cbtn{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:var(--card2);
   color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center}
 .cbtn:active{transform:scale(.92)}
 .numin{width:90px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
   font-family:var(--fbody);font-size:15px;padding:7px 10px;text-align:center}
+
+/* water bar */
+.water-bar-wrap{position:relative;height:68px;border-radius:20px;
+  background:linear-gradient(135deg,#daeef5,#c2e3ef);border:1.5px solid #a6cfe0;
+  overflow:hidden;cursor:pointer;user-select:none;touch-action:none;margin-top:10px}
+.water-fill{position:absolute;left:0;top:0;bottom:0;min-width:0;overflow:hidden;
+  background:linear-gradient(135deg,#5bc8e8 0%,#30a0c8 55%,#1c80a8 100%);
+  border-radius:18px 0 0 18px;transition:width .22s cubic-bezier(.4,0,.2,1)}
+.water-fill.wfull{border-radius:18px}
+.water-shine{position:absolute;top:7px;left:12%;width:34%;height:32%;
+  background:rgba(255,255,255,.22);border-radius:50%;filter:blur(7px);pointer-events:none}
+.water-ripple{position:absolute;right:-2px;top:0;bottom:0;width:18px;
+  background:rgba(255,255,255,.18);filter:blur(4px);
+  animation:rippleEdge 1.6s ease-in-out infinite alternate}
+@keyframes rippleEdge{from{transform:scaleX(1) translateX(0)}to{transform:scaleX(1.8) translateX(4px)}}
+.wbubble{position:absolute;border-radius:50%;background:rgba(255,255,255,.38);
+  animation:bubUp 2.8s ease-in infinite}
+@keyframes bubUp{
+  0%{transform:translateY(0) scale(1);opacity:.75}
+  70%{opacity:.2}
+  100%{transform:translateY(-72px) scale(.35);opacity:0}}
+.water-bar-lbl{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;gap:3px;pointer-events:none;z-index:2}
+.water-bar-lbl .wval{font-family:var(--fdisp);font-size:22px;font-weight:600;transition:color .2s;
+  text-shadow:0 1px 6px rgba(0,0,0,.08)}
+.water-bar-lbl .wtgt{font-size:13px;align-self:flex-end;padding-bottom:4px;transition:color .2s}
+.water-drag-hint{position:absolute;bottom:5px;right:11px;font-size:10px;
+  color:rgba(90,150,180,.7);pointer-events:none;z-index:3;letter-spacing:.3px}
 
 /* workout list */
 .workout{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px;box-shadow:var(--shadow-sm)}
@@ -510,10 +535,9 @@ const WD_NAME = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Targets that apply every day (the non-meal, non-workout checklist items)
 const DAILY_TARGETS = {
-  water: 10,        // glasses (~2.5-3L)
+  water: 2.5,       // litres
   steps: 8000,
   sleepHours: 7.5,
-  supplement: true, // "took supplements as advised"
 };
 
 // Weight trajectory: 52.5 -> 49 over 90 days (even, ~0.3kg/week)
@@ -563,8 +587,7 @@ function dayItemKeys(plan) {
   keys.push("water");
   keys.push("steps");
   keys.push("sleep");
-  keys.push("supplement");
-  return keys; // 6 meals + 5 = 11 items
+  return keys; // 6 meals + 4 = 10 items
 }
 
 
@@ -687,14 +710,29 @@ function renderToday(){
       </div>
     </div>`;
 
-  // daily targets: water dots, steps, sleep, supplement
+  // daily targets: water bar, steps, sleep
   const tb=$("#targetsBox");
-  const waterDots = Array.from({length:DAILY_TARGETS.water},(_,i)=>`<span class="drop ${i<log.water?'full':''}" data-i="${i+1}"></span>`).join("");
-  const supSt=log.items.supplement||"";
+  const waterPct = Math.min((log.water / DAILY_TARGETS.water) * 100, 100);
+  const waterLitres = (log.water||0).toFixed(1);
+  const wFull = log.water >= DAILY_TARGETS.water;
+  const wOver50 = waterPct > 50;
   tb.innerHTML=`
     <div class="item"><div class="body">
-      <div class="when"><span>Water</span><span class="cal">${log.water}/${DAILY_TARGETS.water} glasses</span></div>
-      <div class="counter" style="margin-top:9px"><div class="dots" id="waterDots">${waterDots}</div></div>
+      <div class="when"><span>Water</span><span class="cal">target ${DAILY_TARGETS.water} L</span></div>
+      <div class="water-bar-wrap" id="waterBar">
+        <div class="water-fill${wFull?' wfull':''}" id="waterFill" style="width:${waterPct}%">
+          <div class="water-shine"></div>
+          <div class="water-ripple"></div>
+          <span class="wbubble" style="left:18%;bottom:9px;width:7px;height:7px;animation-delay:0s"></span>
+          <span class="wbubble" style="left:44%;bottom:14px;width:9px;height:9px;animation-delay:.85s"></span>
+          <span class="wbubble" style="left:70%;bottom:7px;width:6px;height:6px;animation-delay:1.65s"></span>
+        </div>
+        <div class="water-bar-lbl">
+          <span class="wval" id="waterVal" style="color:${wOver50?'#ffffff':'#1a5272'}">${waterLitres} L</span>
+          <span class="wtgt" style="color:${wOver50?'rgba(255,255,255,.78)':'rgba(26,82,114,.65)'}"> / ${DAILY_TARGETS.water} L</span>
+        </div>
+        <span class="water-drag-hint">drag ←→</span>
+      </div>
     </div></div>
     <div class="item"><div class="body">
       <div class="when"><span>Steps</span><span class="cal">target ${DAILY_TARGETS.steps.toLocaleString()}</span></div>
@@ -708,16 +746,7 @@ function renderToday(){
       <div class="counter" style="margin-top:9px">
         <input class="numin" id="sleepIn" type="number" step="0.5" inputmode="decimal" placeholder="hrs" value="${log.sleep||""}" style="flex:1;width:auto">
       </div>
-    </div></div>
-    <div class="item ${supSt?supSt:''}">
-      <div class="tick" data-k="supplement" data-cycle="1"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
-      <div class="body"><div class="when"><span>Supplements</span></div>
-        <div class="food">Took supplements as advised (away from thyroid tablet)</div>
-        <div class="stags">
-          <span class="stag ${supSt==='done'?'on-done':''}" data-k="supplement" data-s="done">✓ Done</span>
-          <span class="stag ${supSt==='skip'?'on-skip':''}" data-k="supplement" data-s="skip">✕ Skip</span>
-        </div>
-      </div></div>`;
+    </div></div>`;
 
   bindTodayEvents(iso);
   updateScore(iso);
@@ -736,7 +765,7 @@ function dayScore(iso){
   if(n<1||n>90) return null;
   const plan=getDayPlan(n);
   const log=getLog(iso);
-  const keys=dayItemKeys(plan); // 11 items
+  const keys=dayItemKeys(plan); // 10 items
   let achieved=0;
   keys.forEach(k=>{
     if(k==="water"){ if(log.water>=DAILY_TARGETS.water) achieved++; else if(log.water>=DAILY_TARGETS.water*0.6) achieved+=0.5; }
@@ -811,10 +840,38 @@ function bindTodayEvents(iso){
     t.onclick=e=>e.stopPropagation();
     t.oninput=()=>{ log.notes[t.dataset.k]=t.value; setLog(iso,log); };
   });
-  // water dots
-  $$("#waterDots .drop").forEach(d=>d.onclick=()=>{
-    const i=+d.dataset.i; log.water = (log.water===i)? i-1 : i; setLog(iso,log); renderToday(); haptic();
-  });
+  // water bar drag
+  const wb=$("#waterBar");
+  if(wb){
+    let dragging=false;
+    function setWaterFromX(clientX){
+      const rect=wb.getBoundingClientRect();
+      const pct=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
+      log.water=Math.round(pct*DAILY_TARGETS.water*10)/10;
+      setLog(iso,log); updateWaterBar(); updateScore(iso); haptic();
+    }
+    function updateWaterBar(){
+      const fill=$("#waterFill"), val=$("#waterVal");
+      if(!fill||!val) return;
+      const pct=Math.min((log.water/DAILY_TARGETS.water)*100,100);
+      fill.style.width=pct+"%";
+      fill.classList.toggle("wfull", log.water>=DAILY_TARGETS.water);
+      val.textContent=(log.water||0).toFixed(1)+" L";
+      const over50=pct>50;
+      val.style.color=over50?"#ffffff":"#1a5272";
+      const tgt=wb.querySelector(".wtgt");
+      if(tgt) tgt.style.color=over50?"rgba(255,255,255,.78)":"rgba(26,82,114,.65)";
+      const hint=wb.querySelector(".water-drag-hint");
+      if(hint) hint.style.opacity=over50?"1":"0.5";
+    }
+    wb.addEventListener("mousedown",e=>{dragging=true;setWaterFromX(e.clientX);});
+    wb.addEventListener("mousemove",e=>{if(dragging)setWaterFromX(e.clientX);});
+    document.addEventListener("mouseup",()=>{dragging=false;});
+    wb.addEventListener("touchstart",e=>{dragging=true;setWaterFromX(e.touches[0].clientX);},{passive:true});
+    wb.addEventListener("touchmove",e=>{if(dragging)setWaterFromX(e.touches[0].clientX);},{passive:true});
+    wb.addEventListener("touchend",()=>{dragging=false;});
+    updateWaterBar();
+  }
   // steps & sleep
   const si=$("#stepsIn"); if(si) si.oninput=()=>{ log.steps=+si.value||0; setLog(iso,log); updateScore(iso); stepsStateText(log); };
   const sl=$("#sleepIn"); if(sl) sl.oninput=()=>{ log.sleep=+sl.value||0; setLog(iso,log); updateScore(iso); };
